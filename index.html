@@ -1,0 +1,1199 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2B6CB0">
+<meta name="description" content="Curso de Python estilo Duolingo basado en 30 Days Of Python.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Serpentina">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>Serpentina</title>
+<style>
+@font-face { font-family: "Fredoka"; font-weight: 500; font-style: normal; font-display: swap; src: url("fonts/fredoka-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Fredoka"; font-weight: 600; font-style: normal; font-display: swap; src: url("fonts/fredoka-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Fredoka"; font-weight: 700; font-style: normal; font-display: swap; src: url("fonts/fredoka-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Nunito"; font-weight: 500; font-style: normal; font-display: swap; src: url("fonts/nunito-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Nunito"; font-weight: 600; font-style: normal; font-display: swap; src: url("fonts/nunito-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Nunito"; font-weight: 700; font-style: normal; font-display: swap; src: url("fonts/nunito-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Nunito"; font-weight: 800; font-style: normal; font-display: swap; src: url("fonts/nunito-latin-800-normal.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url("fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 600; font-style: normal; font-display: swap; src: url("fonts/jetbrains-mono-latin-600-normal.woff2") format("woff2"); }
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+/* Layout: una columna angosta tipo app; ruta en zigzag en el inicio, pantalla completa en la lección. */
+:root {
+  --bg: #EEF3F8; --surface: #FFFFFF; --surface-2: #F5F8FB; --ink: #132033; --muted: #5A6A7E; --line: #D3DDE8;
+  --blue: #2B6CB0; --blue-deep: #1E4F86; --blue-soft: #DCE9F7;
+  --sun: #F2B705; --sun-deep: #C99400; --sun-soft: #FFF3C9;
+  --ok: #23935F; --ok-deep: #1A6E47; --ok-soft: #DDF3E7;
+  --bad: #D23F47; --bad-deep: #A82E35; --bad-soft: #FBE2E3;
+  --lock: #C9D3DE; --lock-deep: #AAB7C5; --lock-ink: #7D8B9B;
+  --code-bg: #0F1B2B; --code-ink: #E4ECF5; --code-str: #F2C14E; --code-kw: #7FB8F5; --code-com: #7D8FA6; --code-num: #F28E6B; --code-fn: #8BD3A8;
+  --f-display: "Fredoka", "Nunito", ui-rounded, system-ui, sans-serif;
+  --f-body: "Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-code: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0C1420; --surface: #152132; --surface-2: #1B2A3E; --ink: #E6EDF5; --muted: #95A6BB; --line: #263850;
+  --blue: #5A9BE6; --blue-deep: #2F69AE; --blue-soft: #1A2E48;
+  --sun: #FFC83D; --sun-deep: #B98C12; --sun-soft: #3A3014;
+  --ok: #39BE80; --ok-deep: #22825A; --ok-soft: #12301F;
+  --bad: #EF6870; --bad-deep: #A8414A; --bad-soft: #3A1A1F;
+  --lock: #2B3B50; --lock-deep: #1E2B3C; --lock-ink: #7F90A5;
+  --code-bg: #08101A; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0C1420; --surface: #152132; --surface-2: #1B2A3E; --ink: #E6EDF5; --muted: #95A6BB; --line: #263850;
+  --blue: #5A9BE6; --blue-deep: #2F69AE; --blue-soft: #1A2E48;
+  --sun: #FFC83D; --sun-deep: #B98C12; --sun-soft: #3A3014;
+  --ok: #39BE80; --ok-deep: #22825A; --ok-soft: #12301F;
+  --bad: #EF6870; --bad-deep: #A8414A; --bad-soft: #3A1A1F;
+  --lock: #2B3B50; --lock-deep: #1E2B3C; --lock-ink: #7F90A5;
+  --code-bg: #08101A; color-scheme: dark; }
+
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.5; -webkit-text-size-adjust: 100%; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--surface); }
+button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:focus-visible, textarea:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+code, pre, .mono { font-family: var(--f-code); }
+.wrap { max-width: 620px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 600; text-wrap: balance; margin: 0; }
+
+/* Barra superior */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--surface); border-bottom: 2px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: 12px; padding-block: 10px; }
+.brand { display: flex; align-items: center; gap: 8px; font-family: var(--f-display); font-weight: 700; font-size: 22px; color: var(--blue); margin-right: auto; }
+.brand svg { flex: none; }
+.stat { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; font-size: 16px; font-variant-numeric: tabular-nums; }
+.stat svg { width: 22px; height: 22px; }
+.stat.streak { color: var(--sun-deep); } .stat.xp { color: var(--blue); } .stat.hearts { color: var(--bad); }
+.stat.off { color: var(--lock-ink); }
+
+/* Inicio */
+main.home { padding-block: 18px 48px; display: flex; flex-direction: column; gap: 18px; }
+.goal { display: grid; grid-template-columns: 1fr auto; gap: 12px 14px; align-items: center; background: var(--surface); border: 2px solid var(--line); border-radius: 18px; padding: 16px; }
+.goal h2 { font-size: 19px; }
+.goal p { margin: 2px 0 0; color: var(--muted); font-size: 15px; }
+.bar { height: 14px; border-radius: 99px; background: var(--line); overflow: hidden; grid-column: 1 / -1; }
+.bar > i { display: block; height: 100%; width: 0; border-radius: 99px; background: var(--sun); transition: width .4s ease; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 14px; padding: 12px 18px; font-weight: 800; font-size: 16px; letter-spacing: .02em; text-transform: uppercase; background: var(--blue); color: #fff; box-shadow: 0 4px 0 var(--blue-deep); transition: transform .08s, box-shadow .08s; min-height: 48px; }
+.btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--blue-deep); }
+.btn.ok { background: var(--ok); box-shadow: 0 4px 0 var(--ok-deep); }
+.btn.bad { background: var(--bad); box-shadow: 0 4px 0 var(--bad-deep); }
+.btn.ghost { background: var(--surface); color: var(--blue); box-shadow: 0 4px 0 var(--line); border: 2px solid var(--line); }
+.btn.sun { background: var(--sun); color: #3A2A00; box-shadow: 0 4px 0 var(--sun-deep); }
+.btn:disabled { background: var(--lock); color: var(--lock-ink); box-shadow: 0 4px 0 var(--lock-deep); cursor: default; }
+.btn.wide { width: 100%; }
+.btn.small { min-height: 40px; padding: 8px 14px; font-size: 14px; }
+
+.unit { display: flex; flex-direction: column; gap: 6px; }
+.unit-head { display: flex; align-items: center; gap: 14px; background: var(--blue); color: #fff; border-radius: 18px; padding: 14px 16px; box-shadow: 0 4px 0 var(--blue-deep); }
+.unit-head .num { font-family: var(--f-display); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+.unit-head h2 { font-size: 22px; line-height: 1.15; }
+.unit-head .count { margin-left: auto; font-weight: 800; font-size: 14px; background: rgba(255,255,255,.18); padding: 4px 10px; border-radius: 99px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.unit.done .unit-head { background: var(--ok); box-shadow: 0 4px 0 var(--ok-deep); }
+.path { display: flex; flex-direction: column; align-items: center; gap: 14px; padding-block: 56px 10px; }
+.node-wrap.open { z-index: 10; }
+.node-wrap { position: relative; display: flex; flex-direction: column; align-items: center; }
+.node { width: 72px; height: 66px; border-radius: 50%; border: 0; display: grid; place-items: center; background: var(--blue); color: #fff; box-shadow: 0 7px 0 var(--blue-deep); transition: transform .08s, box-shadow .08s; }
+.node svg { width: 32px; height: 32px; }
+.node:active { transform: translateY(5px); box-shadow: 0 2px 0 var(--blue-deep); }
+.node.done { background: var(--sun); color: #3A2A00; box-shadow: 0 7px 0 var(--sun-deep); }
+.node.done:active { box-shadow: 0 2px 0 var(--sun-deep); }
+.node.locked { background: var(--lock); color: var(--lock-ink); box-shadow: 0 7px 0 var(--lock-deep); }
+.node.current { outline: 6px solid var(--blue-soft); outline-offset: 4px; }
+.node-label { margin-top: 12px; font-weight: 700; font-size: 14px; color: var(--muted); max-width: 150px; text-align: center; line-height: 1.25; }
+.node-wrap.current .node-label { color: var(--ink); }
+.bubble { position: absolute; bottom: calc(100% + 10px); white-space: nowrap; background: var(--surface); border: 2px solid var(--line); color: var(--blue); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: .04em; padding: 6px 12px; border-radius: 12px; animation: bob 1.6s ease-in-out infinite; }
+.bubble::after { content: ""; position: absolute; left: 50%; top: 100%; width: 10px; height: 10px; background: var(--surface); border-right: 2px solid var(--line); border-bottom: 2px solid var(--line); transform: translate(-50%, -5px) rotate(45deg); }
+@keyframes bob { 50% { transform: translateY(-4px); } }
+.pop { position: absolute; top: calc(100% + 10px); z-index: 5; width: min(280px, calc(100vw - 40px)); background: var(--blue); color: #fff; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 10px 30px rgba(10,20,40,.25); }
+.pop.done { background: var(--sun); color: #3A2A00; }
+.pop.locked { background: var(--surface-2); color: var(--muted); border: 2px solid var(--line); }
+.pop h3 { font-size: 18px; }
+.pop p { margin: 0; font-size: 14px; opacity: .9; }
+.pop .btn { background: #fff; color: var(--blue); box-shadow: 0 4px 0 rgba(0,0,0,.18); }
+.pop.done .btn { color: var(--sun-deep); }
+
+.soon { background: var(--surface); border: 2px dashed var(--line); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.soon h2 { font-size: 19px; }
+.soon p { margin: 0; color: var(--muted); font-size: 15px; }
+.soon ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.soon li { display: flex; gap: 8px; align-items: baseline; font-size: 15px; color: var(--muted); padding: 8px 10px; border-radius: 10px; background: var(--surface-2); min-width: 0; }
+.soon li b { font-family: var(--f-display); font-weight: 600; color: var(--lock-ink); font-variant-numeric: tabular-nums; min-width: 22px; }
+.pcode { width: 100%; font-family: var(--f-code); font-size: 13px; padding: 10px; border-radius: 10px; border: 2px solid var(--line); background: var(--surface-2); color: var(--ink); resize: vertical; word-break: break-all; }
+.pmsg { margin: 0; font-size: 14px; color: var(--muted); }
+.sync { text-align: center; color: var(--muted); font-size: 13px; }
+.sync .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--lock-ink); margin-right: 6px; vertical-align: middle; }
+.sync.on .dot { background: var(--ok); }
+
+/* Lección */
+.screen { position: fixed; inset: 0; z-index: 40; background: var(--bg); display: flex; flex-direction: column; padding-top: env(safe-area-inset-top, 0px); }
+.l-top { display: flex; align-items: center; gap: 14px; padding-block: 14px 8px; }
+.icon-btn { border: 0; background: none; padding: 6px; border-radius: 10px; color: var(--muted); display: grid; place-items: center; }
+.icon-btn svg { width: 26px; height: 26px; }
+.l-bar { flex: 1; height: 16px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.l-bar > i { display: block; height: 100%; width: 0; background: var(--ok); border-radius: 99px; transition: width .35s ease; box-shadow: inset 0 -4px 0 rgba(0,0,0,.12); }
+.l-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.l-body .wrap { padding-block: 12px 28px; display: flex; flex-direction: column; gap: 16px; }
+.kind { font-weight: 800; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--blue); display: flex; align-items: center; gap: 6px; }
+.kind.redo { color: var(--sun-deep); }
+.q { font-family: var(--f-display); font-weight: 600; font-size: 23px; line-height: 1.25; }
+.l-foot { border-top: 2px solid var(--line); background: var(--bg); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.l-foot .wrap { padding-block: 14px; display: flex; flex-direction: column; gap: 10px; }
+.l-foot.ok { background: var(--ok-soft); border-color: transparent; }
+.l-foot.bad { background: var(--bad-soft); border-color: transparent; }
+.fb-title { font-family: var(--f-display); font-weight: 700; font-size: 22px; display: flex; align-items: center; gap: 8px; }
+.l-foot.ok .fb-title { color: var(--ok); } .l-foot.bad .fb-title { color: var(--bad); }
+.fb-text { margin: 0; font-size: 15px; }
+.fb-ans { font-family: var(--f-code); font-size: 15px; white-space: pre-wrap; background: var(--surface); border-radius: 10px; padding: 8px 10px; overflow-x: auto; }
+
+pre.code { margin: 0; background: var(--code-bg); color: var(--code-ink); border-radius: 14px; padding: 14px 16px; font-size: 15px; line-height: 1.55; overflow-x: auto; white-space: pre; tab-size: 4; }
+.t-com { color: var(--code-com); font-style: italic; } .t-str { color: var(--code-str); } .t-kw { color: var(--code-kw); font-weight: 600; } .t-num { color: var(--code-num); } .t-fn { color: var(--code-fn); }
+.prose p { margin: 0; }
+.prose code, .q code, .fb-text code { background: var(--blue-soft); color: var(--ink); padding: 1px 6px; border-radius: 6px; font-size: .9em; }
+.theory { display: flex; flex-direction: column; gap: 14px; }
+
+.opts { display: flex; flex-direction: column; gap: 10px; }
+.opt { display: flex; align-items: center; gap: 12px; text-align: left; background: var(--surface); border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 14px; padding: 12px 14px; min-height: 56px; }
+.opt .k { flex: none; width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--line); display: grid; place-items: center; font-size: 14px; font-weight: 800; color: var(--muted); }
+.opt .v { min-width: 0; white-space: pre-wrap; word-break: break-word; }
+.opt .v.mono { font-family: var(--f-code); font-size: 15px; }
+.opt.sel { border-color: var(--blue); background: var(--blue-soft); }
+.opt.sel .k { border-color: var(--blue); color: var(--blue); }
+.opt.right { border-color: var(--ok); background: var(--ok-soft); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.opts.locked .opt { pointer-events: none; }
+
+.slot { display: inline-block; min-width: 3.2em; padding: 0 6px; margin: 0 2px; border-bottom: 3px solid var(--code-kw); color: var(--code-str); text-align: center; cursor: pointer; border-radius: 4px; }
+.slot.filled { background: rgba(127,184,245,.18); }
+.bank { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip { font-family: var(--f-code); font-size: 15px; background: var(--surface); border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 12px; padding: 8px 14px; min-height: 44px; max-width: 100%; text-align: left; white-space: pre; overflow-x: auto; }
+.chip.used { visibility: hidden; }
+.answer-area { min-height: 64px; border: 2px dashed var(--line); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.answer-area:empty::before { content: "Tocá las líneas en orden"; color: var(--muted); font-size: 15px; padding: 8px 4px; }
+.bank.lines { flex-direction: column; }
+.bank.lines .chip, .answer-area .chip { width: 100%; }
+
+/* Editor de código */
+.editor { border-radius: 14px; overflow: hidden; border: 2px solid var(--line); background: var(--code-bg); }
+.editor textarea { display: block; width: 100%; box-sizing: border-box; min-height: 150px; resize: vertical; border: 0; outline: none; background: var(--code-bg); color: var(--code-ink); font-family: var(--f-code); font-size: 16px; line-height: 1.55; padding: 14px 16px; tab-size: 4; white-space: pre; overflow-x: auto; caret-color: var(--code-str); }
+.keys { display: flex; gap: 6px; overflow-x: auto; padding: 8px; background: rgba(255,255,255,.04); border-top: 1px solid rgba(255,255,255,.08); scrollbar-width: none; }
+.keys::-webkit-scrollbar { display: none; }
+.keys button { flex: none; min-width: 38px; height: 38px; border: 0; border-radius: 8px; background: rgba(255,255,255,.1); color: var(--code-ink); font-family: var(--f-code); font-size: 16px; padding: 0 8px; }
+.ed-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.console { background: var(--surface); border: 2px solid var(--line); border-radius: 14px; overflow: hidden; }
+.console .head { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 8px 12px; border-bottom: 2px solid var(--line); display: flex; justify-content: space-between; gap: 8px; }
+.console pre { margin: 0; padding: 10px 12px; font-family: var(--f-code); font-size: 15px; white-space: pre-wrap; word-break: break-word; min-height: 1.5em; }
+.console .err { color: var(--bad); }
+.console .tip { padding: 0 12px 10px; font-size: 14px; color: var(--muted); }
+.note { font-size: 14px; color: var(--muted); background: var(--surface-2); border-radius: 10px; padding: 8px 12px; }
+.inline-msg { border-radius: 12px; padding: 10px 12px; font-size: 15px; }
+.inline-msg.bad { background: var(--bad-soft); color: var(--ink); }
+.inline-msg.ok { background: var(--ok-soft); }
+
+/* Resultado */
+.result { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; padding-block: 24px; }
+.result h1 { font-size: 32px; color: var(--sun-deep); }
+.result p { margin: 0; color: var(--muted); }
+.tiles { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.tile { width: 104px; border-radius: 16px; border: 2px solid var(--c); overflow: hidden; background: var(--surface); }
+.tile .h { background: var(--c); color: #fff; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 4px; }
+.tile .n { font-family: var(--f-display); font-size: 28px; font-weight: 700; padding: 8px; color: var(--c); font-variant-numeric: tabular-nums; }
+.big-icon svg { width: 96px; height: 96px; }
+.shake { animation: shake .35s; }
+@keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+@media (max-width: 420px) { .brand span { display: none; } .q { font-size: 21px; } .top .wrap { gap: 14px; } }
+</style>
+
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const R = String.raw;
+// Tipos: mc (opción múltiple), out (¿qué muestra?), fill (completar), order (ordenar líneas), code (escribir Python real).
+// En mc y out, la primera opción es la correcta; la app las mezcla al mostrarlas.
+const COURSE = [
+{ day: 1, title: "Introducción", lessons: [
+  { id: "d1l1", title: "Hola, Python",
+    intro: [
+      "Python es un lenguaje de programación creado por Guido van Rossum, un programador holandés. La primera versión salió el 20 de febrero de 1991. El nombre viene del programa de humor británico Monty Python's Flying Circus.",
+      "Para mostrar algo en pantalla se usa `print()`. Lo que va entre comillas es texto y Python lo muestra tal cual, sin las comillas.",
+      { code: 'print("Hola, mundo")\n# muestra: Hola, mundo' }
+    ],
+    ex: [
+      { t: "mc", q: "¿Quién creó Python?", opts: ["Guido van Rossum", "Linus Torvalds", "Mark Zuckerberg"], why: "Guido van Rossum publicó la primera versión en 1991." },
+      { t: "mc", q: "¿De dónde sale el nombre Python?", opts: ["Del programa de humor Monty Python's Flying Circus", "De la serpiente pitón", "De una sigla en inglés"], why: "Van Rossum era fan de ese programa británico." },
+      { t: "out", code: 'print("Hola, mundo")', opts: ["Hola, mundo", '"Hola, mundo"', "print Hola, mundo"], why: "Las comillas le avisan a Python dónde empieza y termina el texto. En pantalla no aparecen." },
+      { t: "fill", q: "Completá para mostrar Hola en pantalla.", code: '___("Hola")', bank: ["print", "show", "write"], a: ["print"], why: "La función para mostrar en pantalla es print." },
+      { t: "out", code: "print(3 + 4)", opts: ["7", "3 + 4", "34"], why: "Sin comillas, 3 + 4 es una cuenta y Python muestra el resultado." },
+      { t: "out", code: 'print("3 + 4")', opts: ["3 + 4", "7", '"3 + 4"'], why: "Entre comillas es texto, así que Python lo muestra sin calcular." },
+      { t: "code", q: "Escribí un programa que muestre: Hola, Python", start: "", expect: "Hola, Python", hint: 'Usá print("...") con el texto entre comillas.', sol: 'print("Hola, Python")' }
+    ] },
+  { id: "d1l2", title: "Python como calculadora",
+    intro: [
+      "Python hace cuentas como una calculadora. Estos son los operadores básicos:",
+      { code: "print(2 + 3)   # suma: 5\nprint(7 - 2)   # resta: 5\nprint(3 * 4)   # multiplicación: 12\nprint(7 / 2)   # división: 3.5\nprint(7 // 2)  # división entera: 3\nprint(7 % 2)   # resto: 1\nprint(2 ** 3)  # potencia: 8" }
+    ],
+    ex: [
+      { t: "out", code: "print(3 * 4)", opts: ["12", "34", "7"], why: "* es multiplicación." },
+      { t: "out", code: "print(7 / 2)", opts: ["3.5", "3", "1"], why: "/ siempre da un número con decimales." },
+      { t: "out", code: "print(7 // 2)", opts: ["3", "3.5", "1"], why: "// divide y descarta los decimales." },
+      { t: "out", code: "print(7 % 2)", opts: ["1", "3", "3.5"], why: "% da el resto: 7 dividido 2 da 3 y sobra 1." },
+      { t: "mc", q: "¿Qué operador eleva un número a una potencia?", opts: ["**", "^", "*"], mono: true, why: "En Python la potencia es **. El símbolo ^ hace otra operación." },
+      { t: "fill", q: "Completá para mostrar 2 elevado a la 10 (1024).", code: "print(2 ___ 10)", bank: ["**", "*", "//"], a: ["**"], why: "2 ** 10 es 2 multiplicado por sí mismo 10 veces: 1024." },
+      { t: "code", q: "Mostrá el resultado de 3 + 4 * 2 (escribí la cuenta, Python la resuelve).", start: "", expect: "11", hint: "Python multiplica antes de sumar, igual que en matemática.", sol: "print(3 + 4 * 2)" },
+      { t: "code", q: "Con los números 3 y 4, mostrá la suma, la resta, la multiplicación y el resto (%), una por línea y en ese orden.", start: "", expect: "7\n-1\n12\n3", hint: "Son cuatro print, por ejemplo print(3 + 4).", sol: "print(3 + 4)\nprint(3 - 4)\nprint(3 * 4)\nprint(3 % 4)" }
+    ] },
+  { id: "d1l3", title: "Comentarios e indentación",
+    intro: [
+      "Un comentario empieza con `#`. Python lo ignora: sirve para dejar notas a quien lee el código.",
+      { code: '# Esto es un comentario\nprint("Se ve")  # esto también se ignora' },
+      "La indentación (los espacios al principio de una línea) es parte del código. Después de una línea que termina en dos puntos, el bloque de abajo va con 4 espacios.",
+      { code: 'if 10 > 5:\n    print("10 es mayor que 5")' }
+    ],
+    ex: [
+      { t: "mc", q: "¿Con qué símbolo empieza un comentario?", opts: ["#", "//", "--"], mono: true, why: "En Python los comentarios empiezan con #." },
+      { t: "out", code: '# print("A")\nprint("B")', opts: ["B", "A\nB", "A"], why: "La primera línea es un comentario, así que no se ejecuta." },
+      { t: "out", code: 'print("Hola")  # saludo', opts: ["Hola", "Hola  # saludo", "Error"], why: "Todo lo que está después del # se ignora." },
+      { t: "out", code: 'if 10 > 5:\nprint("Sí")', opts: ["IndentationError (error de indentación)", "Sí", "No muestra nada"], err: "IndentationError", why: "Después de los dos puntos, la línea de abajo tiene que ir con espacios al principio." },
+      { t: "mc", q: "¿Cuántos espacios se usan para indentar, según la guía de estilo de Python?", opts: ["4", "1", "8"], why: "La guía de estilo oficial (PEP 8) recomienda 4 espacios." },
+      { t: "order", q: "Ordená las líneas para que muestre Hola y después Chau.", lines: ["if 3 > 2:", '    print("Hola")', 'print("Chau")'], why: "El print con espacios pertenece al if. El último print va sin espacios." },
+      { t: "code", q: "Escribí un comentario con tu nombre y, abajo, una línea que muestre: Estoy aprendiendo Python", start: "", expect: "Estoy aprendiendo Python", test: "'#' in _src", hint: "Primera línea: # tu nombre. Segunda: un print.", sol: '# Ana\nprint("Estoy aprendiendo Python")' }
+    ] },
+  { id: "d1l4", title: "Tipos de datos",
+    intro: [
+      "Cada valor en Python tiene un tipo. Estos son los principales:",
+      { code: '10                 # int: número entero\n3.14               # float: número con decimales\n1 + 2j             # complex: número complejo\n"Ana"              # str: texto\nTrue               # bool: verdadero o falso\n[1, 2, 3]          # list: lista\n{"nombre": "Ana"}  # dict: diccionario\n(1, 2)             # tuple: tupla\n{1, 2, 3}          # set: conjunto' },
+      "Para saber el tipo de un valor se usa `type()`.",
+      { code: "print(type(10))  # <class 'int'>" }
+    ],
+    ex: [
+      { t: "mc", q: "¿Qué tipo tiene 3.14?", opts: ["float", "int", "str"], mono: true, why: "Los números con decimales son float." },
+      { t: "mc", q: '¿Qué tipo tiene "10", con comillas?', opts: ["str", "int", "float"], mono: true, why: "Las comillas lo convierten en texto, aunque adentro haya un número." },
+      { t: "out", code: "print(type(10))", opts: ["<class 'int'>", "<class 'float'>", "10"] },
+      { t: "out", code: "print(type(True))", opts: ["<class 'bool'>", "<class 'str'>", "True"], why: "True y False son booleanos (bool)." },
+      { t: "mc", q: "¿Cuál de estos valores es una lista?", opts: ["[1, 2, 3]", "(1, 2, 3)", "{1, 2, 3}"], mono: true, why: "Las listas van entre corchetes. Con paréntesis es una tupla y con llaves, un conjunto." },
+      { t: "mc", q: '¿Qué tipo es {"nombre": "Ana", "edad": 30}?', opts: ["dict (diccionario)", "list (lista)", "set (conjunto)"], why: "Pares clave: valor entre llaves forman un diccionario." },
+      { t: "fill", q: "Completá para ver el tipo de 3.5.", code: "print(___(3.5))", bank: ["type", "print", "len"], a: ["type"] },
+      { t: "code", q: 'Mostrá el tipo de 3.14 y el tipo de "Python", uno por línea.', start: "", expect: "<class 'float'>\n<class 'str'>", hint: "print(type(...)) dos veces.", sol: 'print(type(3.14))\nprint(type("Python"))' }
+    ] }
+] },
+{ day: 2, title: "Variables y funciones", lessons: [
+  { id: "d2l1", title: "Variables",
+    intro: [
+      "Una variable es un nombre que guarda un valor. Se crea con el signo `=`.",
+      { code: 'nombre = "Ana"\nedad = 30\nprint(nombre, edad)  # Ana 30' },
+      "Los nombres pueden tener letras, números y guion bajo. No pueden empezar con número ni tener guiones o espacios. Python distingue mayúsculas: `edad` y `Edad` son dos variables distintas. Por costumbre se escriben en minúscula con guion bajo: `nombre_completo`."
+    ],
+    ex: [
+      { t: "out", code: 'ciudad = "Rosario"\nprint(ciudad)', opts: ["Rosario", "ciudad", '"Rosario"'], why: "print muestra el valor guardado en la variable." },
+      { t: "mc", q: "¿Cuál es un nombre de variable válido?", opts: ["nombre_completo", "nombre-completo", "1nombre"], mono: true, why: "Los guiones y empezar con un número no están permitidos." },
+      { t: "mc", q: "¿Cuál de estos nombres da error?", opts: ["mi edad", "mi_edad", "edad2"], mono: true, why: "Los nombres no pueden tener espacios." },
+      { t: "out", code: "x = 5\nx = 8\nprint(x)", opts: ["8", "5", "5 8"], why: "Una variable guarda el último valor que le asignaste." },
+      { t: "out", code: "a = 3\nb = a + 2\nprint(b)", opts: ["5", "a + 2", "3"] },
+      { t: "out", code: "Edad = 30\nprint(edad)", opts: ["NameError (error de nombre)", "30", "Edad"], err: "NameError", why: "edad y Edad son distintas, y edad nunca se creó." },
+      { t: "fill", q: "Completá para guardar el país en una variable.", code: '___ = "Argentina"\nprint(pais)', bank: ["pais", '"pais"', "print"], a: ["pais"], why: "El nombre de la variable va sin comillas." },
+      { t: "code", q: "Creá las variables nombre, apellido y ciudad con texto y mostralas en una sola línea con print.", start: 'nombre = ""\napellido = ""\nciudad = ""\n', test: "isinstance(nombre, str) and isinstance(apellido, str) and isinstance(ciudad, str) and len(nombre) > 0 and len(_out.strip()) > 0", hint: 'Completá las comillas y agregá print(nombre, apellido, ciudad).', sol: 'nombre = "Ana"\napellido = "Gómez"\nciudad = "Córdoba"\nprint(nombre, apellido, ciudad)' }
+    ] },
+  { id: "d2l2", title: "Varias variables a la vez",
+    intro: [
+      "Podés crear varias variables en una línea, separando con comas.",
+      { code: 'nombre, edad, pais = "Ana", 30, "Argentina"\nprint(nombre)  # Ana\nprint(edad)    # 30' },
+      "`print()` acepta varios valores separados por coma y los muestra con un espacio en el medio.",
+      { code: 'print("Tengo", 30, "años")  # Tengo 30 años' }
+    ],
+    ex: [
+      { t: "out", code: "a, b = 1, 2\nprint(b)", opts: ["2", "1", "1 2"] },
+      { t: "out", code: 'a, b, c = "x", "y", "z"\nprint(a, c)', opts: ["x z", "x, z", "xz"], why: "print separa los valores con un espacio." },
+      { t: "out", code: 'print("Tengo", 30, "años")', opts: ["Tengo 30 años", "Tengo,30,años", "Tengo30años"] },
+      { t: "out", code: "a, b = 1, 2\na, b = b, a\nprint(a, b)", opts: ["2 1", "1 2", "2 2"], why: "a, b = b, a intercambia los valores en una sola línea." },
+      { t: "mc", q: "¿Qué pasa con a, b = 1, 2, 3?", opts: ["Da error: hay más valores que variables", "a vale 1 y b vale 2", "b vale 2, 3"], why: "La cantidad de nombres a la izquierda tiene que coincidir con la cantidad de valores." },
+      { t: "code", q: "En una sola línea, creá base = 5 y altura = 3. Después mostrá el área de un rectángulo (base * altura).", start: "", test: "base == 5 and altura == 3 and _out.strip() == '15' and _src.count('=') >= 1", hint: "base, altura = 5, 3", sol: "base, altura = 5, 3\nprint(base * altura)" }
+    ] },
+  { id: "d2l3", title: "Funciones integradas",
+    intro: [
+      "Python trae funciones listas para usar. Algunas de las más comunes:",
+      { code: 'len("hola")      # largo: 4\ntype(3)          # tipo: <class \'int\'>\nabs(-7)          # valor absoluto: 7\nround(3.567, 2)  # redondea: 3.57\nmin(4, 9, 2)     # el menor: 2\nmax(4, 9, 2)     # el mayor: 9\nsum([1, 2, 3])   # suma una lista: 6' },
+      "`input()` le pide a quien usa el programa que escriba algo, y siempre devuelve texto."
+    ],
+    ex: [
+      { t: "out", code: 'print(len("Python"))', opts: ["6", "5", "Python"] },
+      { t: "out", code: "print(abs(-12))", opts: ["12", "-12", "0"] },
+      { t: "out", code: "print(max(3, 15, 8))", opts: ["15", "3", "8"] },
+      { t: "out", code: "print(min([7, 2, 9]))", opts: ["2", "7", "9"] },
+      { t: "out", code: "print(round(3.14159, 2))", opts: ["3.14", "3.1", "3"], why: "El segundo número indica cuántos decimales dejar." },
+      { t: "out", code: "print(sum([10, 20, 30]))", opts: ["60", "102030", "30"] },
+      { t: "fill", q: "Completá para saber cuántos caracteres tiene el texto.", code: 'print(___("Buenos Aires"))', bank: ["len", "sum", "max"], a: ["len"] },
+      { t: "mc", q: "¿Qué tipo de dato devuelve siempre input()?", opts: ["str (texto)", "int (entero)", "Depende de lo que escriba el usuario"], why: 'Aunque escribas 25, input() lo devuelve como el texto "25".' },
+      { t: "code", q: 'Mostrá cuántos caracteres tiene la palabra "Programación".', start: "", expect: "12", hint: "len() y print().", sol: 'print(len("Programación"))' }
+    ] },
+  { id: "d2l4", title: "Convertir tipos",
+    intro: [
+      "A veces hay que cambiar el tipo de un dato. Para eso están `int()`, `float()` y `str()`.",
+      { code: 'int("10")     # 10 (de texto a entero)\nfloat("3.5")  # 3.5\nstr(25)       # "25" (de número a texto)\nint(3.9)      # 3 (corta los decimales)' },
+      "Sumar textos los pega uno al lado del otro:",
+      { code: '"10" + "5"     # "105"\nint("10") + 5  # 15' }
+    ],
+    ex: [
+      { t: "out", code: 'print("10" + "5")', opts: ["105", "15", "Error"], why: "Son textos, así que + los pega." },
+      { t: "out", code: 'print(int("10") + 5)', opts: ["15", "105", "Error"] },
+      { t: "out", code: "print(int(3.9))", opts: ["3", "4", "3.9"], why: "int() corta los decimales sin redondear." },
+      { t: "out", code: "print(float(7))", opts: ["7.0", "7", "Error"] },
+      { t: "out", code: 'print("Edad: " + 30)', opts: ["TypeError (error de tipo)", "Edad: 30", "Edad:30"], err: "TypeError", why: "No se puede sumar texto con número. Hay que convertir: str(30)." },
+      { t: "out", code: 'print(int("3.5"))', opts: ["ValueError (error de valor)", "3", "3.5"], err: "ValueError", why: '"3.5" tiene punto decimal y int() no lo puede leer. Primero float("3.5") y después int().' },
+      { t: "fill", q: "Completá para que muestre: Edad: 30", code: 'edad = 30\nprint("Edad: " + ___(edad))', bank: ["str", "int", "float"], a: ["str"] },
+      { t: "code", q: "El programa pide tu año de nacimiento con input(). Convertilo a número y mostrá tu edad en 2026.", inputs: ["1990"], start: 'anio = input("Año de nacimiento: ")\n', test: "'36' in _out.split()", hint: "int(anio) convierte el texto a número. Después restá: 2026 - int(anio).", sol: 'anio = input("Año de nacimiento: ")\nedad = 2026 - int(anio)\nprint(edad)' }
+    ] }
+] },
+{ day: 3, title: "Operadores", lessons: [
+  { id: "d3l1", title: "Booleanos y asignación",
+    intro: [
+      "Un booleano vale `True` (verdadero) o `False` (falso), siempre con mayúscula inicial.",
+      { code: "print(True)   # True\nprint(5 > 3)  # True" },
+      "El `=` asigna un valor. Los operadores combinados actualizan una variable:",
+      { code: "x = 10\nx += 5   # igual que x = x + 5, ahora vale 15\nx -= 3   # 12\nx *= 2   # 24\nx /= 4   # 6.0" }
+    ],
+    ex: [
+      { t: "mc", q: "¿Cuál es un booleano válido en Python?", opts: ["True", "true", "TRUE"], mono: true, why: "Solo True y False, con mayúscula inicial." },
+      { t: "out", code: "x = 10\nx += 5\nprint(x)", opts: ["15", "10", "105"] },
+      { t: "out", code: "x = 10\nx -= 4\nprint(x)", opts: ["6", "14", "10"] },
+      { t: "out", code: "x = 3\nx *= 4\nprint(x)", opts: ["12", "7", "34"] },
+      { t: "out", code: "x = 9\nx /= 3\nprint(x)", opts: ["3.0", "3", "27"], why: "/= divide, y la división con / siempre da float." },
+      { t: "fill", q: "Completá para sumarle 1 a puntos.", code: "puntos = 0\npuntos ___ 1\nprint(puntos)", bank: ["+=", "=+", "++"], a: ["+="], why: "+= suma y guarda. Python no tiene el operador ++." },
+      { t: "code", q: "Creá saldo = 1000. Restale 250 usando -= y mostrá el saldo.", start: "", test: "saldo == 750 and '750' in _out and '-=' in _src", hint: "saldo -= 250", sol: "saldo = 1000\nsaldo -= 250\nprint(saldo)" }
+    ] },
+  { id: "d3l2", title: "Cuentas y orden",
+    intro: [
+      "Python respeta el orden de la matemática: primero potencias, después multiplicación y división, al final suma y resta. Los paréntesis cambian el orden.",
+      { code: "print(2 + 3 * 4)    # 14\nprint((2 + 3) * 4)  # 20" }
+    ],
+    ex: [
+      { t: "out", code: "print(2 + 3 * 4)", opts: ["14", "20", "24"] },
+      { t: "out", code: "print((2 + 3) * 4)", opts: ["20", "14", "24"] },
+      { t: "out", code: "print(10 % 3)", opts: ["1", "3", "3.33"] },
+      { t: "out", code: "print(10 // 3)", opts: ["3", "3.33", "1"] },
+      { t: "out", code: "print(3 ** 2)", opts: ["9", "6", "32"] },
+      { t: "mc", q: "¿Cómo sabés si un número n es par?", opts: ["n % 2 == 0", "n / 2 == 0", "n // 2 == 1"], mono: true, why: "Si el resto de dividir por 2 es 0, el número es par." },
+      { t: "order", q: "Ordená el programa que calcula el área de un círculo de radio 10.", lines: ["radio = 10", "area = 3.14 * radio ** 2", "print(area)"], why: "Primero se crea la variable, después se usa." },
+      { t: "code", q: "Calculá el área de un triángulo con base = 20 y altura = 10 (base * altura / 2) y mostrala.", start: "", test: "_out.strip() in ('100.0', '100')", hint: "base = 20, altura = 10, y después print(base * altura / 2).", sol: "base = 20\naltura = 10\nprint(base * altura / 2)" },
+      { t: "code", q: "Un auto recorre 300 km en 4 horas. Mostrá la velocidad promedio (km dividido horas).", start: "", test: "_out.strip() in ('75.0', '75')", hint: "print(300 / 4)", sol: "km = 300\nhoras = 4\nprint(km / horas)" }
+    ] },
+  { id: "d3l3", title: "Comparar",
+    intro: [
+      "Los operadores de comparación devuelven True o False:",
+      { code: "print(3 > 2)   # True\nprint(3 < 2)   # False\nprint(3 == 3)  # True: igual a\nprint(3 != 3)  # False: distinto de\nprint(3 >= 3)  # True: mayor o igual" },
+      "Un solo `=` asigna y dos `==` comparan. Para textos y listas también existen `in` y `not in`:",
+      { code: 'print("on" in "Python")  # True' }
+    ],
+    ex: [
+      { t: "out", code: "print(5 == 5)", opts: ["True", "False", "5"] },
+      { t: "out", code: "print(5 != 5)", opts: ["False", "True", "Error"], why: "!= pregunta si son distintos, y 5 es igual a 5." },
+      { t: "out", code: "print(7 >= 7)", opts: ["True", "False"] },
+      { t: "mc", q: "¿Qué diferencia hay entre = y ==?", opts: ["= asigna un valor y == compara", "Son lo mismo", "= compara y == asigna"] },
+      { t: "out", code: 'print("py" in "python")', opts: ["True", "False"] },
+      { t: "out", code: 'print("A" == "a")', opts: ["False", "True"], why: "Mayúsculas y minúsculas son caracteres distintos." },
+      { t: "out", code: 'print(len("python") > len("dragon"))', opts: ["False", "True"], why: "Las dos palabras tienen 6 letras, y 6 no es mayor que 6." },
+      { t: "fill", q: "Completá para comprobar que 10 es mayor que 3.", code: "print(10 ___ 3)", bank: [">", "<", "="], a: [">"] },
+      { t: "code", q: 'Mostrá si "on" está en "python" y también en "dragon". El resultado tiene que ser True.', start: "", test: "'True' in _out and 'False' not in _out and 'in' in _src", hint: 'Usá in dos veces y unilos con and: "on" in "python" and ...', sol: 'print("on" in "python" and "on" in "dragon")' }
+    ] },
+  { id: "d3l4", title: "and, or, not",
+    intro: [
+      "`and` da True si las dos condiciones son verdaderas. `or` da True si al menos una lo es. `not` invierte el valor.",
+      { code: "print(3 > 2 and 4 > 3)  # True\nprint(3 > 2 and 4 < 3)  # False\nprint(3 > 2 or 4 < 3)   # True\nprint(not 3 > 2)        # False" }
+    ],
+    ex: [
+      { t: "out", code: "print(True and False)", opts: ["False", "True"] },
+      { t: "out", code: "print(True or False)", opts: ["True", "False"] },
+      { t: "out", code: "print(not True)", opts: ["False", "True"] },
+      { t: "out", code: "print(5 > 3 and 2 > 1)", opts: ["True", "False"] },
+      { t: "out", code: "edad = 16\nprint(edad >= 18 or edad == 16)", opts: ["True", "False"], why: "La primera condición es falsa, pero la segunda es verdadera, y con or alcanza una." },
+      { t: "mc", q: "Para entrar hay que ser mayor de 18 y tener entrada. ¿Qué operador usás?", opts: ["and", "or", "not"], mono: true },
+      { t: "fill", q: "Completá: es fin de semana si es sábado o domingo.", code: 'dia = "sábado"\nprint(dia == "sábado" ___ dia == "domingo")', bank: ["or", "and", "not"], a: ["or"] },
+      { t: "code", q: "Creá edad = 25 y tiene_dni = True. Mostrá True si puede votar: edad de 16 o más y DNI.", start: "", test: "edad == 25 and tiene_dni == True and _out.strip() == 'True'", hint: "print(edad >= 16 and tiene_dni)", sol: "edad = 25\ntiene_dni = True\nprint(edad >= 16 and tiene_dni)" }
+    ] },
+  { id: "d3l5", title: "Práctica de operadores",
+    intro: [
+      "Ejercicios del día 3 del curso original, adaptados. Acá vas a escribir más código propio.",
+      { code: "horas = 40\npago = 28\nprint(horas * pago)" }
+    ],
+    ex: [
+      { t: "code", q: "Calculá el sueldo semanal con horas = 40 y pago_por_hora = 28. Mostrá el total.", start: "", expect: "1120", hint: "Multiplicá las dos variables.", sol: "horas = 40\npago_por_hora = 28\nprint(horas * pago_por_hora)" },
+      { t: "code", q: "Mostrá cuántos segundos vive una persona de 100 años (años de 365 días).", start: "", expect: "3153600000", hint: "100 * 365 * 24 * 60 * 60", sol: "print(100 * 365 * 24 * 60 * 60)" },
+      { t: "out", code: "print(type(10 / 2))", opts: ["<class 'float'>", "<class 'int'>", "5"], why: "La división con / siempre da float, aunque el resultado sea exacto." },
+      { t: "out", code: "print(10 // 2 == 10 / 2)", opts: ["True", "False"], why: "5 y 5.0 valen lo mismo, así que == da True." },
+      { t: "code", q: "Calculá la pendiente entre los puntos (2, 2) y (6, 10): (y2 - y1) / (x2 - x1). Mostrala.", start: "x1, y1 = 2, 2\nx2, y2 = 6, 10\n", test: "_out.strip() in ('2.0', '2')", hint: "print((y2 - y1) / (x2 - x1))", sol: "x1, y1 = 2, 2\nx2, y2 = 6, 10\nprint((y2 - y1) / (x2 - x1))" }
+    ] }
+] },
+{ day: 4, title: "Textos (strings)", lessons: [
+  { id: "d4l1", title: "Crear y unir textos",
+    intro: [
+      "Un string es texto entre comillas simples o dobles. Para varias líneas se usan tres comillas.",
+      { code: "letra = \"P\"\nfrase = 'Hola, mundo'\nlargo = \"\"\"Texto de\nvarias líneas\"\"\"" },
+      "Unir textos se llama concatenar y se hace con `+`. `len()` da la cantidad de caracteres, espacios incluidos.",
+      { code: 'nombre = "Ana"\napellido = "Gómez"\ncompleto = nombre + " " + apellido\nprint(completo)       # Ana Gómez\nprint(len(completo))  # 9' }
+    ],
+    ex: [
+      { t: "out", code: 'print("Hola" + "Mundo")', opts: ["HolaMundo", "Hola Mundo", "Hola+Mundo"], why: "+ pega los textos sin agregar espacios." },
+      { t: "out", code: 'print("Hola" + " " + "Mundo")', opts: ["Hola Mundo", "HolaMundo", "Hola  Mundo"] },
+      { t: "out", code: 'print(len("Hola Mundo"))', opts: ["10", "9", "2"], why: "El espacio también cuenta como carácter." },
+      { t: "out", code: 'print("ja" * 3)', opts: ["jajaja", "ja3", "Error"], why: "Texto por número repite el texto." },
+      { t: "mc", q: "¿Cuál es un string válido?", opts: ["'Hola'", "Hola", "\"Hola'"], mono: true, why: "Tiene que abrir y cerrar con el mismo tipo de comillas." },
+      { t: "fill", q: "Completá para unir las palabras con un espacio.", code: 'print("Thirty" ___ " " ___ "Days")', bank: ["+", "+", "*", "-"], a: ["+", "+"] },
+      { t: "code", q: "Uní 'Coding', 'For' y 'All' con espacios y mostralo: Coding For All", start: "", expect: "Coding For All", hint: 'print("Coding" + " " + "For" + ...)', sol: 'print("Coding" + " " + "For" + " " + "All")' },
+      { t: "code", q: 'Creá company = "Coding For All" y mostrá su largo con len().', start: "", test: "company == 'Coding For All' and _out.strip() == '14'", hint: "print(len(company))", sol: 'company = "Coding For All"\nprint(len(company))' }
+    ] },
+  { id: "d4l2", title: "Saltos de línea y f-strings",
+    intro: [
+      "Dentro de un texto, la barra invertida arma secuencias especiales:",
+      { code: R`print("Línea 1\nLínea 2")     # \n: salto de línea
+print("Días\tTemas")          # \t: tabulación
+print("Ella dijo \"hola\"")  # \": comillas adentro del texto` },
+      "Para meter variables dentro de un texto se usan los f-strings: una `f` antes de las comillas y las variables entre llaves.",
+      { code: 'nombre = "Ana"\nedad = 30\nprint(f"Soy {nombre} y tengo {edad} años")\n# Soy Ana y tengo 30 años' },
+      "Dentro de las llaves también podés hacer cuentas: `f\"{3 + 4}\"` da 7."
+    ],
+    ex: [
+      { t: "out", code: R`print("A\nB")`, opts: ["A\nB", R`A\nB`, "AB"], why: "\\n es un salto de línea, así que B aparece abajo." },
+      { t: "out", code: 'nombre = "Leo"\nprint(f"Hola, {nombre}")', opts: ["Hola, Leo", "Hola, {nombre}", "Hola, nombre"] },
+      { t: "out", code: 'print(f"{2 + 3}")', opts: ["5", "2 + 3", "{2 + 3}"] },
+      { t: "out", code: 'nombre = "Leo"\nprint("Hola, {nombre}")', opts: ["Hola, {nombre}", "Hola, Leo", "Error"], why: "Sin la f adelante, las llaves se muestran tal cual." },
+      { t: "mc", q: "¿Qué secuencia hace un salto de línea?", opts: [R`\n`, R`\t`, R`\s`], mono: true },
+      { t: "fill", q: "Completá para que muestre: Tengo 30 años", code: 'edad = 30\nprint(___"Tengo {edad} años")', bank: ["f", "r", "s"], a: ["f"] },
+      { t: "code", q: "Con a = 4 y b = 3, usá un f-string para mostrar: 4 + 3 = 7", start: "a = 4\nb = 3\n", test: "_out.strip() == '4 + 3 = 7' and a == 4 and b == 3 and '{' in _src", hint: 'print(f"{a} + {b} = {a + b}")', sol: 'a = 4\nb = 3\nprint(f"{a} + {b} = {a + b}")' },
+      { t: "code", q: R`Con un solo print y \n, mostrá en dos líneas: Python (arriba) y es genial (abajo).`, start: "", expect: "Python\nes genial", test: "_src.count('print') == 1", hint: R`print("Python\nes genial")`, sol: R`print("Python\nes genial")` }
+    ] },
+  { id: "d4l3", title: "Índices y recortes",
+    intro: [
+      "Cada carácter de un string tiene una posición, llamada índice. Se cuenta desde 0. Los índices negativos cuentan desde el final.",
+      { code: 'lenguaje = "Python"\nprint(lenguaje[0])   # P\nprint(lenguaje[5])   # n\nprint(lenguaje[-1])  # n, el último' },
+      "Para recortar un pedazo (slicing) se usa `[inicio:fin]`. El índice del fin no se incluye.",
+      { code: "print(lenguaje[0:3])   # Pyt\nprint(lenguaje[3:])    # hon\nprint(lenguaje[::-1])  # nohtyP, invertido\nprint(lenguaje[::2])   # Pto, de a dos" }
+    ],
+    ex: [
+      { t: "out", code: 'print("Python"[0])', opts: ["P", "y", "Error"] },
+      { t: "out", code: 'print("Python"[1])', opts: ["y", "P", "t"], why: "Los índices empiezan en 0, así que [1] es el segundo carácter." },
+      { t: "out", code: 'print("Python"[-1])', opts: ["n", "P", "o"] },
+      { t: "out", code: 'print("Python"[0:2])', opts: ["Py", "Pyt", "yt"], why: "El índice final (2) no se incluye." },
+      { t: "out", code: 'print("Python"[2:])', opts: ["thon", "ython", "Py"] },
+      { t: "out", code: 'print("hola"[::-1])', opts: ["aloh", "hola", "h"] },
+      { t: "out", code: 'print("Python"[10])', opts: ["IndexError (índice fuera de rango)", "n", "No muestra nada"], err: "IndexError", why: '"Python" tiene índices del 0 al 5.' },
+      { t: "fill", q: "Completá para mostrar Coding, las primeras 6 letras.", code: 'texto = "Coding For All"\nprint(texto[___])', bank: ["0:6", "1:6", "0:5", "6:"], a: ["0:6"] },
+      { t: "code", q: 'Mostrá el texto "Coding For All" al revés.', start: "", expect: "llA roF gnidoC", hint: "[::-1]", sol: 'print("Coding For All"[::-1])' }
+    ] },
+  { id: "d4l4", title: "Métodos de strings",
+    intro: [
+      "Los strings tienen métodos: funciones que se escriben con un punto después del texto.",
+      { code: 't = "coding for all"\nt.upper()                # CODING FOR ALL\nt.title()                # Coding For All\nt.capitalize()           # Coding for all\nt.replace("all", "vos")  # coding for vos\nt.split()                # [\'coding\', \'for\', \'all\']\nt.count("o")             # 2\nt.find("for")            # 7\nt.startswith("cod")      # True\n"   hola  ".strip()      # hola' },
+      "Un método devuelve un texto nuevo. El original queda igual."
+    ],
+    ex: [
+      { t: "out", code: 'print("hola".upper())', opts: ["HOLA", "Hola", "hola"] },
+      { t: "out", code: 'print("buenos aires".title())', opts: ["Buenos Aires", "Buenos aires", "BUENOS AIRES"] },
+      { t: "out", code: 'print("a,b,c".split(","))', opts: ["['a', 'b', 'c']", "a b c", "['a,b,c']"], why: "split corta el texto donde aparece la coma y devuelve una lista." },
+      { t: "out", code: 'print("banana".count("a"))', opts: ["3", "2", "1"] },
+      { t: "out", code: 'print("Python".find("th"))', opts: ["2", "3", "-1"], why: "find devuelve el índice donde empieza: P es 0, y es 1, t es 2." },
+      { t: "out", code: 't = "hola"\nt.upper()\nprint(t)', opts: ["hola", "HOLA", "Error"], why: "upper() devuelve un texto nuevo. Como no lo guardaste, t sigue igual." },
+      { t: "fill", q: "Completá para cambiar Python por Código.", code: 'print("Python para todos".___("Python", "Código"))', bank: ["replace", "split", "find"], a: ["replace"] },
+      { t: "mc", q: "¿Qué método saca los espacios del principio y del final?", opts: ["strip()", "split()", "title()"], mono: true },
+      { t: "code", q: 'Mostrá la sigla de "Python For Everyone": PFE. Usá índices para tomar cada inicial.', start: 't = "Python For Everyone"\n', test: "_out.strip() == 'PFE' and '[' in _src", hint: "La P está en el índice 0, la F en el 7 y la E en el 11.", sol: 't = "Python For Everyone"\nprint(t[0] + t[7] + t[11])' },
+      { t: "code", q: 'Mostrá True o False según si "Coding For All" empieza con "Coding".', start: "", test: "_out.strip() == 'True' and 'startswith' in _src", hint: '.startswith("Coding")', sol: 'print("Coding For All".startswith("Coding"))' }
+    ] },
+  { id: "d4l5", title: "Práctica de strings",
+    intro: [
+      "Ejercicios del día 4 del curso original. Combiná lo que viste: unir, recortar, métodos y f-strings.",
+      { code: 'empresas = "Facebook, Google"\nprint(empresas.split(", "))  # [\'Facebook\', \'Google\']' }
+    ],
+    ex: [
+      { t: "code", q: "Uní 'Thirty', 'Days', 'Of' y 'Python' para mostrar: Thirty Days Of Python", start: "", expect: "Thirty Days Of Python", hint: "Podés usar + con espacios, o un f-string.", sol: 'print("Thirty" + " " + "Days" + " " + "Of" + " " + "Python")' },
+      { t: "code", q: 'Separá "Facebook, Google, Microsoft, Apple" en la coma y el espacio, y mostrá la lista.', start: 'texto = "Facebook, Google, Microsoft, Apple"\n', expect: "['Facebook', 'Google', 'Microsoft', 'Apple']", hint: 'texto.split(", ")', sol: 'texto = "Facebook, Google, Microsoft, Apple"\nprint(texto.split(", "))' },
+      { t: "out", code: 'print("Coding For All".index("F"))', opts: ["7", "6", "8"], why: "Coding ocupa los índices 0 a 5, el espacio es el 6 y la F es el 7." },
+      { t: "out", code: 'print("Coding For All".rfind("l"))', opts: ["13", "12", "11"], why: "rfind busca desde el final. La última l es el último carácter, índice 13." },
+      { t: "out", code: 'print("   hola   ".strip() + "!")', opts: ["hola!", "   hola   !", "hola !"] },
+      { t: "code", q: 'Con nombre = "Ana" y pais = "Argentina", usá un f-string para mostrar: Ana vive en Argentina', start: 'nombre = "Ana"\npais = "Argentina"\n', expect: "Ana vive en Argentina", test: "'{' in _src", hint: 'print(f"{nombre} vive en {pais}")', sol: 'nombre = "Ana"\npais = "Argentina"\nprint(f"{nombre} vive en {pais}")' }
+    ] }
+] },
+{ day: 5, title: "Listas", lessons: [
+  { id: "d5l1", title: "Crear listas",
+    intro: [
+      "Una lista guarda varios valores en orden, entre corchetes y separados por coma. Puede mezclar tipos y se puede modificar.",
+      { code: 'frutas = ["banana", "naranja", "mango"]\nvacia = []\nmezcla = ["Ana", 30, True]\nprint(len(frutas))  # 3' },
+      "Cada elemento se lee por índice, igual que en los strings:",
+      { code: "print(frutas[0])   # banana\nprint(frutas[-1])  # mango" },
+      "Desempaquetar es guardar cada elemento en una variable:",
+      { code: "a, b, c = frutas\nprint(b)  # naranja\nprimero, *resto = [1, 2, 3, 4]\nprint(resto)  # [2, 3, 4]" }
+    ],
+    ex: [
+      { t: "mc", q: "¿Cómo se crea una lista vacía?", opts: ["[]", "()", "{}"], mono: true, why: "[] es una lista vacía. () es una tupla y {} un diccionario." },
+      { t: "out", code: 'frutas = ["banana", "naranja", "mango"]\nprint(frutas[1])', opts: ["naranja", "banana", "mango"] },
+      { t: "out", code: 'frutas = ["banana", "naranja", "mango"]\nprint(frutas[-1])', opts: ["mango", "banana", "Error"] },
+      { t: "out", code: "print(len([1, 2, 3, 4]))", opts: ["4", "3", "10"] },
+      { t: "out", code: "a, b, c = [10, 20, 30]\nprint(c)", opts: ["30", "10", "[10, 20, 30]"] },
+      { t: "out", code: "primero, *resto = [1, 2, 3, 4]\nprint(resto)", opts: ["[2, 3, 4]", "2", "[1, 2, 3, 4]"], why: "El asterisco junta en una lista todo lo que sobra." },
+      { t: "fill", q: "Completá para mostrar el primer elemento.", code: 'paises = ["Argentina", "Chile", "Uruguay"]\nprint(paises[___])', bank: ["0", "1", "-1"], a: ["0"] },
+      { t: "code", q: "Creá la lista empresas con Facebook, Google, Microsoft, Apple, IBM, Oracle y Amazon. Mostrá la lista y después cuántas empresas tiene.", start: "", test: "empresas == ['Facebook', 'Google', 'Microsoft', 'Apple', 'IBM', 'Oracle', 'Amazon'] and '7' in _out", hint: 'empresas = ["Facebook", "Google", ...] y después print(len(empresas)).', sol: 'empresas = ["Facebook", "Google", "Microsoft", "Apple", "IBM", "Oracle", "Amazon"]\nprint(empresas)\nprint(len(empresas))' }
+    ] },
+  { id: "d5l2", title: "Recortar y modificar",
+    intro: [
+      "El slicing funciona igual que en los strings y devuelve una lista nueva.",
+      { code: "n = [10, 20, 30, 40, 50]\nprint(n[1:3])   # [20, 30]\nprint(n[:2])    # [10, 20]\nprint(n[::-1])  # [50, 40, 30, 20, 10]" },
+      "Las listas se pueden modificar asignando por índice. Los strings no.",
+      { code: "n[0] = 99\nprint(n)  # [99, 20, 30, 40, 50]" },
+      "Con `in` comprobás si un elemento está en la lista:",
+      { code: "print(30 in n)  # True" }
+    ],
+    ex: [
+      { t: "out", code: "n = [10, 20, 30, 40, 50]\nprint(n[1:3])", opts: ["[20, 30]", "[20, 30, 40]", "[10, 20, 30]"] },
+      { t: "out", code: "n = [10, 20, 30, 40, 50]\nprint(n[-2:])", opts: ["[40, 50]", "[50]", "[10, 20]"] },
+      { t: "out", code: "n = [1, 2, 3]\nn[1] = 7\nprint(n)", opts: ["[1, 7, 3]", "[7, 2, 3]", "[1, 2, 7]"] },
+      { t: "out", code: 'print("mango" in ["banana", "mango"])', opts: ["True", "False"] },
+      { t: "out", code: 't = "hola"\nt[0] = "H"\nprint(t)', opts: ["TypeError (los strings no se pueden modificar)", "Hola", "hola"], err: "TypeError", why: "Para cambiar un string hay que crear uno nuevo, por ejemplo con replace()." },
+      { t: "fill", q: 'Completá para cambiar el último elemento por "kiwi".', code: 'frutas = ["banana", "mango", "uva"]\nfrutas[___] = "kiwi"\nprint(frutas)', bank: ["-1", "0", "3"], a: ["-1"], why: "-1 siempre es el último. Con 3 da error, porque los índices son 0, 1 y 2." },
+      { t: "code", q: "Mostrá las 3 primeras empresas y las 3 últimas (dos print).", start: 'empresas = ["Facebook", "Google", "Microsoft", "Apple", "IBM", "Oracle", "Amazon"]\n', expect: "['Facebook', 'Google', 'Microsoft']\n['IBM', 'Oracle', 'Amazon']", hint: "empresas[:3] y empresas[-3:]", sol: 'empresas = ["Facebook", "Google", "Microsoft", "Apple", "IBM", "Oracle", "Amazon"]\nprint(empresas[:3])\nprint(empresas[-3:])' }
+    ] },
+  { id: "d5l3", title: "Agregar y sacar",
+    intro: [
+      "Métodos para agregar y sacar elementos:",
+      { code: 'frutas = ["banana", "mango"]\nfrutas.append("uva")      # agrega al final\nfrutas.insert(1, "kiwi")  # agrega en la posición 1\nprint(frutas)  # [\'banana\', \'kiwi\', \'mango\', \'uva\']\n\nfrutas.remove("mango")  # saca ese elemento\nfrutas.pop()            # saca el último\nfrutas.pop(0)           # saca el de la posición 0\ndel frutas[0]           # borra por índice\nfrutas.clear()          # vacía la lista' }
+    ],
+    ex: [
+      { t: "out", code: 'f = ["a", "b"]\nf.append("c")\nprint(f)', opts: ["['a', 'b', 'c']", "['c', 'a', 'b']", "['a', 'b']"] },
+      { t: "out", code: 'f = ["a", "c"]\nf.insert(1, "b")\nprint(f)', opts: ["['a', 'b', 'c']", "['b', 'a', 'c']", "['a', 'c', 'b']"] },
+      { t: "out", code: 'f = ["a", "b", "c"]\nf.remove("b")\nprint(f)', opts: ["['a', 'c']", "['a', 'b']", "['b']"] },
+      { t: "out", code: 'f = ["a", "b", "c"]\nf.pop()\nprint(f)', opts: ["['a', 'b']", "['b', 'c']", "['a', 'b', 'c']"] },
+      { t: "out", code: 'f = ["a", "b", "c"]\nx = f.pop(0)\nprint(x)', opts: ["a", "c", "['b', 'c']"], why: "pop() devuelve el elemento que saca." },
+      { t: "mc", q: "¿Qué método agrega un elemento al final?", opts: ["append()", "insert()", "add()"], mono: true },
+      { t: "order", q: 'Ordená: crear la lista, agregar "uva" al final y mostrarla.', lines: ['frutas = ["banana"]', 'frutas.append("uva")', "print(frutas)"] },
+      { t: "code", q: 'Agregá "Amazon" al final, insertá "IBM" en la posición 1 y mostrá la lista.', start: 'empresas = ["Google", "Apple"]\n', test: "empresas == ['Google', 'IBM', 'Apple', 'Amazon'] and len(_out.strip()) > 0", hint: 'empresas.append("Amazon") y empresas.insert(1, "IBM")', sol: 'empresas = ["Google", "Apple"]\nempresas.append("Amazon")\nempresas.insert(1, "IBM")\nprint(empresas)' }
+    ] },
+  { id: "d5l4", title: "Ordenar, contar y unir",
+    intro: [
+      "Más métodos de listas:",
+      { code: "n = [3, 1, 2, 1]\nn.count(1)   # 2: cuántas veces aparece\nn.index(2)   # 2: en qué posición está\nn.reverse()  # da vuelta la lista: [1, 2, 1, 3]\nn.sort()     # ordena de menor a mayor: [1, 1, 2, 3]\nn.sort(reverse=True)  # de mayor a menor\nsorted(n)    # devuelve una lista ordenada nueva" },
+      "Para unir listas se usa `+` o `extend()`. Para copiar, `copy()`.",
+      { code: "a = [1, 2]\nb = [3, 4]\nprint(a + b)  # [1, 2, 3, 4]\na.extend(b)   # ahora a es [1, 2, 3, 4]\ncopia = a.copy()" }
+    ],
+    ex: [
+      { t: "out", code: "print([3, 1, 2].count(5))", opts: ["0", "Error", "-1"], why: "5 no aparece ninguna vez." },
+      { t: "out", code: "n = [3, 1, 2]\nn.sort()\nprint(n)", opts: ["[1, 2, 3]", "[3, 2, 1]", "[3, 1, 2]"] },
+      { t: "out", code: "n = [3, 1, 2]\nn.reverse()\nprint(n)", opts: ["[2, 1, 3]", "[1, 2, 3]", "[3, 2, 1]"], why: "reverse() da vuelta el orden actual, sin ordenar." },
+      { t: "out", code: "print([1, 2] + [3])", opts: ["[1, 2, 3]", "[1, 2, [3]]", "[6]"] },
+      { t: "out", code: "edades = [19, 22, 19, 24]\nprint(edades.index(22))", opts: ["1", "22", "2"] },
+      { t: "out", code: "n = [3, 1, 2]\nm = sorted(n)\nprint(n)", opts: ["[3, 1, 2]", "[1, 2, 3]", "None"], why: "sorted() devuelve una lista nueva y deja la original como estaba." },
+      { t: "fill", q: "Completá para ordenar de mayor a menor.", code: "n = [5, 9, 1]\nn.sort(___=True)\nprint(n)", bank: ["reverse", "desc", "mayor"], a: ["reverse"] },
+      { t: "code", q: "Ordená la lista y mostrá la edad mínima y la máxima, en dos líneas.", start: "edades = [19, 22, 19, 24, 20, 25, 26, 24, 25, 24]\n", test: "_out.strip().split('\\n')[-2:] == ['19', '26']", hint: "Después de edades.sort(), la mínima es edades[0] y la máxima edades[-1].", sol: "edades = [19, 22, 19, 24, 20, 25, 26, 24, 25, 24]\nedades.sort()\nprint(edades[0])\nprint(edades[-1])" },
+      { t: "code", q: "Mostrá la mediana: el promedio de los dos valores del medio después de ordenar.", start: "edades = [19, 22, 19, 24, 20, 25, 26, 24, 25, 24]\n", test: "_out.strip() in ('24.0', '24')", hint: "La lista tiene 10 elementos. Ordenala y promediá los índices 4 y 5.", sol: "edades = [19, 22, 19, 24, 20, 25, 26, 24, 25, 24]\nedades.sort()\nprint((edades[4] + edades[5]) / 2)" }
+    ] }
+] }
+];
+
+const UPCOMING = [
+  [6, "Tuplas"], [7, "Conjuntos"], [8, "Diccionarios"], [9, "Condicionales"], [10, "Bucles"],
+  [11, "Funciones"], [12, "Módulos"], [13, "Listas por comprensión"], [14, "Funciones de orden superior"],
+  [15, "Tipos de errores"], [16, "Fechas y horas"], [17, "Manejo de excepciones"], [18, "Expresiones regulares"],
+  [19, "Archivos"], [20, "Paquetes con pip"], [21, "Clases y objetos"], [22, "Web scraping"],
+  [23, "Entornos virtuales"], [24, "Estadística"], [25, "Pandas"], [26, "Python para la web"],
+  [27, "Python con MongoDB"], [28, "APIs"], [29, "Crear una API"], [30, "Cierre"]
+];
+const BEYOND = ["Automatización: Excel, CSV, archivos y PDFs", "Proyectos propios: bot, scraper, web y gastos", "Repaso inteligente de todo el curso"];
+
+</script>
+<script>
+(function () {
+"use strict";
+const MAX_HEARTS = 5, REGEN_MS = 30 * 60 * 1000, LS_KEY = "serpentina-v1";
+const BRYTHON_URL = "brython.min.js";
+
+// ---------- Íconos ----------
+const I = {
+  flame: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 2c.6 3.2-1 5-2.6 6.8C8.4 10.4 7 12 7 14.6A5 5 0 0 0 12 20a5 5 0 0 0 5-5.2c0-2-1-3.6-2.2-4.8.1 1.6-.4 2.8-1.6 3.4.5-3.3-.3-7.5-.7-11.4Z"/></svg>',
+  bolt: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 2 4 13.5h6.2L9 22l10-12.2h-6.4L13.5 2Z"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.4C1 8.3 3 4.8 6.6 4.8c2.1 0 3.5 1.2 4.4 2.6.9-1.4 2.3-2.6 4.4-2.6 3.6 0 5.6 3.5 4.2 6.8C19.5 16.4 12 21 12 21Z"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.8 2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3-4.6-4.4 6.3-.9L12 2.8Z"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V8a5 5 0 0 1 10 0v2h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h1Zm2 0h6V8a3 3 0 0 0-6 0v2Z"/></svg>',
+  close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  x: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  ok: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  play: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 4.5v15l13-7.5-13-7.5Z"/></svg>',
+  review: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg>',
+  logo: '<svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="var(--blue)"/><path d="M6 20c3-6 6-6 8.5-2s5.5 4 8-1.5" stroke="var(--sun)" stroke-width="3.4" stroke-linecap="round"/><circle cx="24" cy="13" r="2" fill="#fff"/></svg>'
+};
+
+// ---------- Datos del curso ----------
+const LESSONS = [];
+COURSE.forEach(d => d.lessons.forEach((l, i) => { l.day = d.day; l.dayTitle = d.title; l.n = i + 1; l.of = d.lessons.length; LESSONS.push(l); }));
+const EX_BY_ID = {};
+LESSONS.forEach(l => l.ex.forEach((e, i) => { EX_BY_ID[l.id + "-" + i] = e; }));
+
+// ---------- Estado ----------
+function today(d = new Date()) { const p = n => String(n).padStart(2, "0"); return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()); }
+function yesterday() { const d = new Date(); d.setDate(d.getDate() - 1); return today(d); }
+function fresh() { return { v: 1, xp: 0, done: {}, streak: { n: 0, last: null }, hearts: { n: MAX_HEARTS, ts: 0 }, mistakes: [], day: { date: null, count: 0 }, updatedAt: 0 }; }
+let S = fresh();
+try { const raw = localStorage.getItem(LS_KEY); if (raw) S = Object.assign(fresh(), JSON.parse(raw)); } catch (e) {}
+
+let remote = { ref: null, on: false, writing: false, again: false };
+function persistLocal() { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) {} }
+async function save() {
+  S.updatedAt = Date.now();
+  persistLocal();
+  if (!remote.ref) return;
+  if (remote.writing) { remote.again = true; return; }
+  remote.writing = true;
+  try { await remote.ref.set(JSON.parse(JSON.stringify(S))); remote.on = true; }
+  catch (e) { remote.on = false; }
+  remote.writing = false;
+  renderSync();
+  if (remote.again) { remote.again = false; save(); }
+}
+function adopt(data) {
+  if (!data || typeof data !== "object") return false;
+  if ((data.updatedAt || 0) <= (S.updatedAt || 0)) return false;
+  S = Object.assign(fresh(), data); persistLocal(); return true;
+}
+async function initRemote() {
+  if (!window.claude || !window.claude.use) { renderSync(); return; }
+  try {
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    const uid = user ? await user.id() : null;
+    if (!db || !uid) { renderSync(); return; }
+    remote.ref = db.doc("data/users/" + uid + "/progress");
+    const snap = await remote.ref.get();
+    remote.on = true;
+    if (snap.exists && adopt(snap.data())) { if (!lesson) renderHome(); }
+    else if ((S.updatedAt || 0) > ((snap.exists && snap.data().updatedAt) || 0)) { save(); }
+    renderSync();
+    remote.ref.onSnapshot(s => { if (s.exists && !s.metadata.hasPendingWrites && adopt(s.data()) && !lesson) renderHome(); }, () => { remote.on = false; renderSync(); });
+  } catch (e) { remote.on = false; renderSync(); }
+}
+
+function heartsNow() {
+  const h = S.hearts; if (h.n >= MAX_HEARTS) return MAX_HEARTS;
+  return Math.min(MAX_HEARTS, h.n + Math.floor((Date.now() - h.ts) / REGEN_MS));
+}
+function loseHeart() {
+  const cur = heartsNow(), h = S.hearts;
+  const gained = h.n >= MAX_HEARTS ? 0 : Math.floor((Date.now() - h.ts) / REGEN_MS);
+  const ts = cur >= MAX_HEARTS ? Date.now() : h.ts + gained * REGEN_MS;
+  S.hearts = { n: Math.max(0, cur - 1), ts };
+}
+function gainHeart() { const cur = heartsNow(); S.hearts = { n: Math.min(MAX_HEARTS, cur + 1), ts: cur + 1 >= MAX_HEARTS ? 0 : Date.now() }; }
+function nextHeartIn() { const h = S.hearts; const ms = REGEN_MS - ((Date.now() - h.ts) % REGEN_MS); return Math.ceil(ms / 60000); }
+function streakNow() { const s = S.streak; return (s.last === today() || s.last === yesterday()) ? s.n : 0; }
+function todayCount() { return S.day.date === today() ? S.day.count : 0; }
+function firstUndone() { const i = LESSONS.findIndex(l => !S.done[l.id]); return i === -1 ? LESSONS.length : i; }
+
+// ---------- Utilidades ----------
+const $ = (sel, root = document) => root.querySelector(sel);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const inline = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const KW = new Set("if else elif for while in not and or def return import from as True False None class del is lambda pass break continue try except with".split(" "));
+const FN = new Set("print len type int float str input abs round min max sum sorted list range".split(" "));
+function hl(src) {
+  const re = /(#[^\n]*)|("""[\s\S]*?"""|'''[\s\S]*?'''|[fr]?"(?:\\.|[^"\\\n])*"|[fr]?'(?:\\.|[^'\\\n])*')|(\b\d+(?:\.\d+)?j?\b)|([A-Za-z_]\w*)/g;
+  let out = "", last = 0, m;
+  while ((m = re.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    if (m[1]) out += '<span class="t-com">' + esc(m[1]) + "</span>";
+    else if (m[2]) out += '<span class="t-str">' + esc(m[2]) + "</span>";
+    else if (m[3]) out += '<span class="t-num">' + esc(m[3]) + "</span>";
+    else if (KW.has(m[4])) out += '<span class="t-kw">' + m[4] + "</span>";
+    else if (FN.has(m[4]) && src[m.index + m[4].length] === "(") out += '<span class="t-fn">' + m[4] + "</span>";
+    else out += esc(m[4]);
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+function el(html) { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+
+// ---------- Python (Brython) ----------
+const RUNNER = [
+  "from browser import window",
+  "def run_user(src, test, inputs):",
+  "    parts = []",
+  "    def _print(*args, sep=' ', end='\\n', file=None, flush=False):",
+  "        parts.append(sep.join(str(a) for a in args) + end)",
+  "    feed = list(inputs)",
+  "    def _input(msg=''):",
+  "        v = feed.pop(0) if feed else ''",
+  "        parts.append(str(msg) + v + '\\n')",
+  "        return v",
+  "    ns = {'__name__': '__main__', 'print': _print, 'input': _input}",
+  "    err = ''",
+  "    ok = -1",
+  "    try:",
+  "        exec(src, ns)",
+  "        if test:",
+  "            ns['_out'] = ''.join(parts)",
+  "            ns['_src'] = src",
+  "            ok = 1 if eval(test, ns) else 0",
+  "    except BaseException as e:",
+  "        err = type(e).__name__ + ': ' + str(e)",
+  "    window.pyDone(''.join(parts), err, ok)",
+  "window.pyRun = run_user"
+].join("\n");
+let pyPromise = null, pyResult = null;
+window.pyDone = (o, e, k) => { pyResult = { out: o, err: e, ok: k }; };
+function loadPython() {
+  if (pyPromise) return pyPromise;
+  pyPromise = new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = BRYTHON_URL; s.async = true;
+    s.onerror = () => reject(new Error("load"));
+    s.onload = () => {
+      try {
+        const py = document.createElement("script");
+        py.type = "text/python"; py.id = "pyrunner"; py.textContent = RUNNER;
+        document.body.appendChild(py);
+        window.brython({ debug: 0, ids: ["pyrunner"] });
+      } catch (e) { reject(e); return; }
+      const t0 = Date.now();
+      (function wait() { if (window.pyRun) resolve(); else if (Date.now() - t0 > 12000) reject(new Error("timeout")); else setTimeout(wait, 40); })();
+    };
+    document.head.appendChild(s);
+  });
+  pyPromise.catch(() => { pyPromise = null; });
+  return pyPromise;
+}
+function cleanSrc(s) { return s.replace(/[“”„«»]/g, '"').replace(/[‘’‚]/g, "'").replace(/ /g, " ").replace(/\t/g, "    "); }
+async function runPython(src, test, inputs) {
+  await loadPython();
+  pyResult = null;
+  window.pyRun(src, test || "", inputs || []);
+  return pyResult || { out: "", err: "Error: no se pudo ejecutar", ok: -1 };
+}
+const ERR_TIPS = {
+  SyntaxError: "Python no entiende cómo está escrita una línea. Revisá paréntesis, comillas y dos puntos.",
+  IndentationError: "Hay un problema con los espacios al principio de alguna línea.",
+  NameError: "Usaste un nombre que Python no conoce. Revisá que esté bien escrito (mayúsculas incluidas) o si te faltan comillas.",
+  TypeError: "Estás combinando tipos que no van juntos, por ejemplo texto + número.",
+  ValueError: "El valor no tiene el formato esperado, por ejemplo int(\"hola\").",
+  IndexError: "Pediste un índice que no existe. Recordá que se cuenta desde 0.",
+  ZeroDivisionError: "No se puede dividir por cero.",
+  AttributeError: "Ese método no existe para este tipo de dato. Revisá cómo está escrito."
+};
+function normOut(s) { return s.replace(/\r/g, "").split("\n").map(l => l.replace(/\s+$/, "")).join("\n").trim(); }
+
+// ---------- Render: inicio ----------
+const app = $("#app");
+let openPop = null, lesson = null;
+
+function topBar() {
+  const h = heartsNow(), st = streakNow();
+  return `<header class="top"><div class="wrap">
+    <div class="brand">${I.logo}<span>Serpentina</span></div>
+    <span class="stat streak ${st ? "" : "off"}" title="Racha de días">${I.flame}${st}</span>
+    <span class="stat xp" title="Puntos de experiencia">${I.bolt}${S.xp}</span>
+    <span class="stat hearts ${h ? "" : "off"}" title="Vidas">${I.heart}${h}</span>
+  </div></header>`;
+}
+function renderSync() {
+  const n = $("#sync"); if (!n) return;
+  n.className = "sync" + (remote.on ? " on" : "");
+  n.innerHTML = '<span class="dot"></span>' + (remote.on ? "Progreso sincronizado" : "Tu progreso se guarda en este dispositivo y funciona sin internet");
+}
+function renderHome() {
+  lesson = null; openPop = null;
+  const cur = firstUndone(), tc = todayCount(), mist = S.mistakes.length;
+  const next = LESSONS[cur];
+  let html = topBar() + '<main class="home wrap">';
+  html += `<section class="goal">
+    <div><h2>${tc >= 1 ? "Meta del día cumplida" : "Meta del día: 1 lección"}</h2>
+    <p>${tc >= 1 ? "Hiciste " + tc + (tc === 1 ? " lección" : " lecciones") + " hoy. Podés seguir o volver mañana." : "Unos 5 minutos. Hoy llevás 0."}</p></div>
+    ${next ? `<button class="btn ${tc >= 1 ? "ghost" : ""}" data-start="${next.id}">${I.play}${tc >= 1 ? "Otra" : "Empezar"}</button>` : ""}
+    <div class="bar"><i style="width:${Math.min(100, tc * 100)}%"></i></div>
+    ${mist ? `<button class="btn ghost wide small" id="reviewBtn" style="grid-column:1/-1">Repasar errores (${mist})</button>` : ""}
+  </section>`;
+  COURSE.forEach(d => {
+    const done = d.lessons.filter(l => S.done[l.id]).length;
+    html += `<section class="unit ${done === d.lessons.length ? "done" : ""}">
+      <div class="unit-head"><div><div class="num">Día ${d.day}</div><h2>${esc(d.title)}</h2></div><span class="count">${done}/${d.lessons.length}</span></div>
+      <div class="path">`;
+    d.lessons.forEach((l, i) => {
+      const gi = LESSONS.indexOf(l), isDone = !!S.done[l.id], isCur = gi === cur, locked = gi > cur;
+      const off = [0, 56, 76, 56, 0, -56, -76, -56][(gi) % 8];
+      html += `<div class="node-wrap ${isCur ? "current" : ""}" style="transform:translateX(${off}px)">
+        ${isCur ? '<span class="bubble">' + (gi === 0 && !S.xp ? "Empezá acá" : "Seguí acá") + "</span>" : ""}
+        <button class="node ${isDone ? "done" : locked ? "locked" : ""} ${isCur ? "current" : ""}" data-node="${l.id}" aria-label="Lección: ${esc(l.title)}">${isDone ? I.check : locked ? I.lock : I.star}</button>
+        <div class="node-label">${esc(l.title)}</div>
+      </div>`;
+    });
+    html += "</div></section>";
+  });
+  html += `<section class="soon"><h2>Próximamente: días 6 a 30</h2>
+    <p>Se agregan por tandas. Los días 20, 23, 26, 27 y 29 llevan teoría y desafíos para hacer en la computadora.</p>
+    <ol>${UPCOMING.map(([n, t]) => `<li><b>${n}</b><span>${esc(t)}</span></li>`).join("")}</ol></section>`;
+  html += `<section class="soon"><h2>Después del día 30</h2><ol>${BEYOND.map((t, i) => `<li><b>+${i + 1}</b><span>${esc(t)}</span></li>`).join("")}</ol></section>`;
+  html += `<section class="soon" id="transfer"><h2>Pasar tu progreso a otro dispositivo</h2>
+    <p>Copiá tu código acá y pegalo en el otro dispositivo (por ejemplo, de la computadora al iPhone). Se combinan las lecciones hechas en los dos.</p>
+    <div class="ed-actions"><button class="btn ghost small" id="expBtn">Copiar mi código</button><button class="btn ghost small" id="impBtn">Pegar un código</button></div>
+    <div id="pbox"></div></section>`;
+  html += '<p class="sync" id="sync"></p></main>';
+  app.innerHTML = html;
+  renderSync();
+  app.querySelectorAll("[data-start]").forEach(b => b.onclick = () => startLesson(b.dataset.start));
+  const rb = $("#reviewBtn"); if (rb) rb.onclick = startReview;
+  app.querySelectorAll("[data-node]").forEach(b => b.onclick = (ev) => { ev.stopPropagation(); togglePop(b); });
+  $("#expBtn").onclick = exportProgress;
+  $("#impBtn").onclick = importForm;
+}
+function encodeProgress() { return "SERP1." + btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
+function decodeProgress(code) {
+  const m = String(code).trim().match(/SERP1\.([A-Za-z0-9+/=]+)/);
+  if (!m) return null;
+  try { const d = JSON.parse(decodeURIComponent(escape(atob(m[1])))); return d && typeof d.done === "object" ? d : null; } catch (e) { return null; }
+}
+function exportProgress() {
+  const code = encodeProgress(), box = $("#pbox");
+  box.innerHTML = `<textarea id="pcode" class="pcode" readonly rows="3" aria-label="Código de progreso"></textarea><p class="pmsg" id="pmsg"></p>`;
+  const ta = $("#pcode"); ta.value = code;
+  const done = () => { $("#pmsg").textContent = "Código copiado. Abrí Serpentina en el otro dispositivo y tocá Pegar un código."; };
+  const fallback = () => { ta.focus(); ta.select(); $("#pmsg").textContent = "Seleccioná el código y copialo."; };
+  try { navigator.clipboard.writeText(code).then(done, fallback); } catch (e) { fallback(); }
+}
+function importForm() {
+  const box = $("#pbox");
+  box.innerHTML = `<textarea id="pcode" class="pcode" rows="3" placeholder="Pegá acá el código que empieza con SERP1." aria-label="Pegar código de progreso"></textarea>
+    <div class="ed-actions"><button class="btn small" id="doImp">Combinar progreso</button></div><p class="pmsg" id="pmsg"></p>`;
+  $("#doImp").onclick = () => {
+    const d = decodeProgress($("#pcode").value);
+    if (!d) { $("#pmsg").textContent = "El código no es válido. Copialo completo, desde SERP1. hasta el final."; return; }
+    mergeProgress(d); save(); renderHome();
+    const m = $("#pbox"); if (m) m.innerHTML = '<p class="pmsg">Progreso combinado. Lecciones hechas en este dispositivo: ' + Object.keys(S.done).length + ".</p>";
+    const t = $("#transfer"); if (t) t.scrollIntoView({ block: "center" });
+  };
+}
+function mergeProgress(d) {
+  const o = Object.assign(fresh(), d);
+  Object.entries(o.done || {}).forEach(([k, v]) => { const c = S.done[k]; if (!c || (v.best || 0) > (c.best || 0)) S.done[k] = v; });
+  S.xp = Math.max(S.xp || 0, o.xp || 0);
+  if ((o.streak.last || "") > (S.streak.last || "") || (o.streak.last === S.streak.last && o.streak.n > S.streak.n)) S.streak = o.streak;
+  if (o.day.date === S.day.date) S.day.count = Math.max(S.day.count, o.day.count); else if ((o.day.date || "") > (S.day.date || "")) S.day = o.day;
+  S.mistakes = Array.from(new Set(S.mistakes.concat(o.mistakes || []))).filter(id => EX_BY_ID[id]);
+}
+function togglePop(btn) {
+  const wrap = btn.parentElement;
+  const had = wrap.querySelector(".pop");
+  document.querySelectorAll(".pop").forEach(p => p.remove());
+  document.querySelectorAll(".node-wrap.open").forEach(w => w.classList.remove("open"));
+  if (had) return;
+  wrap.classList.add("open");
+  const l = LESSONS.find(x => x.id === btn.dataset.node), gi = LESSONS.indexOf(l), cur = firstUndone();
+  const isDone = !!S.done[l.id], locked = gi > cur;
+  const pop = el(`<div class="pop ${isDone ? "done" : locked ? "locked" : ""}">
+    <h3>${esc(l.title)}</h3>
+    <p>Día ${l.day}, lección ${l.n} de ${l.of}. ${l.ex.length} ejercicios.</p>
+    ${locked ? "<p>Completá las lecciones anteriores para desbloquearla.</p>" : `<button class="btn wide">${isDone ? "Repetir" : "Empezar"}</button>`}
+  </div>`);
+  wrap.appendChild(pop);
+  const b = pop.querySelector("button"); if (b) b.onclick = () => startLesson(l.id);
+  if (locked) { btn.classList.remove("shake"); void btn.offsetWidth; btn.classList.add("shake"); }
+}
+document.addEventListener("click", e => { if (!e.target.closest(".pop") && !e.target.closest("[data-node]")) document.querySelectorAll(".pop").forEach(p => p.remove()); });
+
+// ---------- Lección ----------
+function needsPython(items) { return items.some(it => it.ex.t === "code"); }
+function startLesson(id) {
+  const l = LESSONS.find(x => x.id === id);
+  if (heartsNow() <= 0) { renderNoHearts(); return; }
+  lesson = { l, review: false, queue: l.ex.map((e, i) => ({ ex: e, id: l.id + "-" + i, redo: false })), total: l.ex.length, correct: 0, missed: new Set(), stage: "intro", answer: null };
+  if (needsPython(lesson.queue)) loadPython().catch(() => {});
+  renderLesson();
+}
+function startReview() {
+  const ids = shuffle(S.mistakes.filter(id => EX_BY_ID[id])).slice(0, 8);
+  if (!ids.length) { S.mistakes = []; save(); renderHome(); return; }
+  lesson = { l: { title: "Repaso de errores" }, review: true, queue: ids.map(id => ({ ex: EX_BY_ID[id], id, redo: false })), total: ids.length, correct: 0, missed: new Set(), stage: "ex", answer: null };
+  if (needsPython(lesson.queue)) loadPython().catch(() => {});
+  renderLesson();
+}
+function quitLesson() { lesson = null; save(); renderHome(); window.scrollTo(0, 0); }
+
+function lessonShell(inner, foot) {
+  const pct = lesson ? Math.round(100 * lesson.correct / lesson.total) : 0;
+  const h = heartsNow();
+  return `<div class="screen" id="screen">
+    <div class="wrap l-top">
+      <button class="icon-btn" id="quit" aria-label="Salir de la lección">${I.close}</button>
+      <div class="l-bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
+      ${lesson && lesson.review ? "" : `<span class="stat hearts ${h ? "" : "off"}">${I.heart}${h}</span>`}
+    </div>
+    <div class="l-body" id="lbody"><div class="wrap">${inner}</div></div>
+    <div class="l-foot" id="lfoot"><div class="wrap">${foot}</div></div>
+  </div>`;
+}
+function renderLesson() {
+  if (!lesson) return;
+  if (lesson.stage === "intro") return renderIntro();
+  if (!lesson.queue.length) return finishLesson();
+  renderExercise();
+}
+function renderIntro() {
+  const l = lesson.l;
+  const blocks = l.intro.map(b => typeof b === "string" ? `<p>${inline(b)}</p>` : `<pre class="code">${hl(b.code)}</pre>`).join("");
+  app.innerHTML = lessonShell(`<div class="kind">Día ${l.day} · Teoría</div><h1 class="q">${esc(l.title)}</h1><div class="theory prose">${blocks}</div>`,
+    `<button class="btn wide" id="go">Practicar</button>`);
+  $("#quit").onclick = quitLesson;
+  $("#go").onclick = () => { lesson.stage = "ex"; renderLesson(); };
+}
+
+const KIND = { mc: "Elegí la respuesta", out: "¿Qué muestra este código?", fill: "Completá el código", order: "Ordená las líneas", code: "Escribí Python" };
+function renderExercise() {
+  const item = lesson.queue[0], e = item.ex;
+  lesson.answer = null; item.attempts = item.attempts || 0;
+  let body = `<div class="kind ${item.redo ? "redo" : ""}">${item.redo ? "Otra vez" : KIND[e.t]}</div>`;
+  if (e.t === "out") body += `<div class="q">¿Qué muestra?</div><pre class="code">${hl(e.code)}</pre>`;
+  else body += `<div class="q">${inline(e.q)}</div>`;
+  if (e.t === "mc" || e.t === "out") {
+    item.order = item.order || shuffle(e.opts.map((_, i) => i));
+    const mono = e.t === "out" || e.mono;
+    body += `<div class="opts" id="opts">${item.order.map((oi, k) => `<button class="opt" data-i="${oi}"><span class="k">${k + 1}</span><span class="v ${mono ? "mono" : ""}">${esc(e.opts[oi])}</span></button>`).join("")}</div>`;
+  } else if (e.t === "fill") {
+    const parts = e.code.split("___");
+    let code = "";
+    parts.forEach((p, i) => { code += hl(p); if (i < parts.length - 1) code += `<span class="slot" data-slot="${i}">&nbsp;</span>`; });
+    item.bankOrder = item.bankOrder || shuffle(e.bank.map((_, i) => i));
+    body += `<pre class="code" id="fillcode">${code}</pre><div class="bank" id="bank">${item.bankOrder.map(i => `<button class="chip" data-b="${i}">${esc(e.bank[i])}</button>`).join("")}</div>`;
+  } else if (e.t === "order") {
+    if (!item.lineOrder) { let o; do { o = shuffle(e.lines.map((_, i) => i)); } while (o.every((v, i) => v === i) && e.lines.length > 1); item.lineOrder = o; }
+    body += `<div class="answer-area" id="area"></div><div class="bank lines" id="bank">${item.lineOrder.map(i => `<button class="chip" data-b="${i}">${esc(e.lines[i])}</button>`).join("")}</div>`;
+  } else if (e.t === "code") {
+    const keys = ["(", ")", '"', ":", "=", "[", "]", ",", ".", "_", "+", "#", "{", "}", "'", "*", "-", "/", "<", ">", "⇥"];
+    body += `${e.inputs ? `<div class="note">Cuando el programa pida datos con input(), se va a escribir automáticamente: ${e.inputs.map(esc).join(", ")}</div>` : ""}
+      <div class="editor"><textarea id="ed" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Editor de código Python">${esc(item.draft != null ? item.draft : (e.start || ""))}</textarea>
+      <div class="keys" id="keys">${keys.map(k => `<button type="button" data-k="${esc(k)}" aria-label="Insertar ${k === "⇥" ? "4 espacios" : esc(k)}">${esc(k)}</button>`).join("")}</div></div>
+      <div class="ed-actions"><button class="btn ghost small" id="run">${I.play}Ejecutar</button>${item.attempts >= 2 ? '<button class="btn ghost small" id="sol">Ver solución</button>' : ""}${e.hint ? '<button class="btn ghost small" id="hint">Pista</button>' : ""}</div>
+      <div id="hintbox"></div>
+      <div class="console" id="console"><div class="head"><span>Salida</span><span id="pystat">${window.pyRun ? "" : "Cargando Python…"}</span></div><pre id="outp"></pre></div>`;
+  }
+  app.innerHTML = lessonShell(body, `<button class="btn wide ok" id="check" disabled>Comprobar</button>`);
+  $("#quit").onclick = quitLesson;
+  wireExercise(item);
+}
+function setAnswer(v) { lesson.answer = v; $("#check").disabled = v == null; }
+function wireExercise(item) {
+  const e = item.ex, check = $("#check");
+  if (e.t === "mc" || e.t === "out") {
+    const opts = [...document.querySelectorAll(".opt")];
+    opts.forEach(b => b.onclick = () => { opts.forEach(x => x.classList.remove("sel")); b.classList.add("sel"); setAnswer(+b.dataset.i); });
+  } else if (e.t === "fill") {
+    const slots = [...document.querySelectorAll(".slot")], filled = slots.map(() => null);
+    const sync = () => { slots.forEach((s, i) => { s.textContent = filled[i] == null ? " " : e.bank[filled[i]]; s.classList.toggle("filled", filled[i] != null); });
+      document.querySelectorAll("#bank .chip").forEach(c => c.classList.toggle("used", filled.includes(+c.dataset.b)));
+      setAnswer(filled.every(f => f != null) ? filled.map(f => e.bank[f]) : null); };
+    document.querySelectorAll("#bank .chip").forEach(c => c.onclick = () => { const k = filled.indexOf(null); if (k >= 0) { filled[k] = +c.dataset.b; sync(); } });
+    slots.forEach((s, i) => s.onclick = () => { filled[i] = null; sync(); });
+  } else if (e.t === "order") {
+    const picked = [], area = $("#area");
+    const sync = () => {
+      area.innerHTML = picked.map((i, k) => `<button class="chip" data-p="${k}">${esc(e.lines[i])}</button>`).join("");
+      area.querySelectorAll(".chip").forEach(c => c.onclick = () => { picked.splice(+c.dataset.p, 1); sync(); });
+      document.querySelectorAll("#bank .chip").forEach(c => c.classList.toggle("used", picked.includes(+c.dataset.b)));
+      setAnswer(picked.length === e.lines.length ? picked.slice() : null);
+    };
+    document.querySelectorAll("#bank .chip").forEach(c => c.onclick = () => { const b = +c.dataset.b; if (!picked.includes(b)) { picked.push(b); sync(); } });
+  } else if (e.t === "code") wireEditor(item);
+  check.onclick = () => evaluate(item);
+}
+
+function wireEditor(item) {
+  const e = item.ex, ta = $("#ed");
+  const update = () => { item.draft = ta.value; setAnswer(ta.value.trim() ? ta.value : null); };
+  update();
+  const insert = (txt) => {
+    const s = ta.selectionStart, en = ta.selectionEnd;
+    ta.setRangeText(txt, s, en, "end"); ta.focus(); update();
+  };
+  ta.addEventListener("input", update);
+  ta.addEventListener("keydown", ev => {
+    if (ev.key === "Tab") { ev.preventDefault(); insert("    "); }
+    else if (ev.key === "Enter" && (ev.metaKey || ev.ctrlKey)) { ev.preventDefault(); if (!$("#check").disabled) $("#check").click(); }
+    else if (ev.key === "Enter") {
+      const before = ta.value.slice(0, ta.selectionStart), line = before.split("\n").pop();
+      let ind = (line.match(/^ */) || [""])[0]; if (/:\s*$/.test(line)) ind += "    ";
+      if (ind) { ev.preventDefault(); insert("\n" + ind); }
+    }
+  });
+  document.querySelectorAll("#keys button").forEach(b => {
+    b.addEventListener("pointerdown", ev => ev.preventDefault());
+    b.onclick = () => insert(b.dataset.k === "⇥" ? "    " : b.dataset.k);
+  });
+  if (!window.pyRun) loadPython().then(() => { const s = $("#pystat"); if (s) s.textContent = ""; }).catch(() => { const s = $("#pystat"); if (s) s.textContent = "Sin conexión"; });
+  $("#run").onclick = () => runAndShow(item, false);
+  const hb = $("#hint"); if (hb) hb.onclick = () => { $("#hintbox").innerHTML = `<div class="note">${inline(e.hint)}</div>`; };
+  const sb = $("#sol"); if (sb) sb.onclick = () => { ta.value = e.sol; item.sawSolution = true; update(); $("#hintbox").innerHTML = '<div class="note">Esta es una solución posible. Leela, ejecutala y tocá Comprobar. El ejercicio vuelve en el repaso.</div>'; };
+}
+async function runAndShow(item, checking) {
+  const e = item.ex, outp = $("#outp"), stat = $("#pystat");
+  const src = cleanSrc($("#ed").value);
+  if (!window.pyRun) { stat.textContent = "Cargando Python…"; }
+  let r;
+  try { r = await runPython(src, checking ? e.test : "", e.inputs); }
+  catch (err) {
+    outp.innerHTML = '<span class="err">No se pudo cargar Python en este dispositivo. Revisá la conexión y probá de nuevo, o seguí con la solución.</span>';
+    stat.textContent = "Sin Python";
+    if (!$("#skipPy")) {
+      const sk = el('<button class="btn ghost small" id="skipPy">Ver solución y seguir</button>');
+      $(".ed-actions").appendChild(sk);
+      sk.onclick = () => { $("#ed").value = e.sol; item.sawSolution = true; feedback(item, true); };
+    }
+    return null;
+  }
+  stat.textContent = "";
+  let html = esc(r.out);
+  if (r.err) {
+    const name = r.err.split(":")[0];
+    html += (html ? "\n" : "") + '<span class="err">' + esc(r.err) + "</span>";
+    outp.innerHTML = html;
+    const c = $("#console"); c.querySelectorAll(".tip").forEach(t => t.remove());
+    if (ERR_TIPS[name]) c.insertAdjacentHTML("beforeend", `<div class="tip">${esc(ERR_TIPS[name])}</div>`);
+  } else {
+    outp.innerHTML = html || '<span style="color:var(--muted)">(el programa no mostró nada)</span>';
+    $("#console").querySelectorAll(".tip").forEach(t => t.remove());
+  }
+  return r;
+}
+
+function correctText(e) {
+  if (e.t === "mc" || e.t === "out") return e.opts[0];
+  if (e.t === "fill") { let c = e.code; e.a.forEach(a => { c = c.replace("___", a); }); return c; }
+  if (e.t === "order") return e.lines.join("\n");
+  return e.sol;
+}
+async function evaluate(item) {
+  const e = item.ex, check = $("#check");
+  if (e.t === "code") {
+    check.disabled = true; check.textContent = "Ejecutando…";
+    const r = await runAndShow(item, true);
+    check.textContent = "Comprobar"; check.disabled = false;
+    if (!r) return;
+    let ok = !r.err;
+    if (ok && e.expect != null) ok = normOut(r.out) === e.expect;
+    if (ok && e.test) ok = r.ok === 1;
+    if (ok) return feedback(item, true);
+    item.attempts++;
+    const msg = r.err ? "El programa dio un error. Leé el mensaje en la salida." : (e.expect != null && normOut(r.out) !== e.expect ? "La salida no coincide con lo que pide el ejercicio." : "El programa corre, pero todavía no cumple lo que pide el enunciado.");
+    $("#hintbox").innerHTML = `<div class="inline-msg bad">${esc(msg)}${item.attempts >= 2 ? " Si te trabaste, podés ver la solución." : ""}</div>`;
+    if (item.attempts === 2 && !$("#sol")) {
+      const b = el('<button class="btn ghost small" id="sol">Ver solución</button>');
+      $(".ed-actions").insertBefore(b, $("#hint"));
+      b.onclick = () => { const ta = $("#ed"); ta.value = e.sol; item.sawSolution = true; item.draft = e.sol; setAnswer(e.sol); $("#hintbox").innerHTML = '<div class="note">Esta es una solución posible. Leela, ejecutala y tocá Comprobar. El ejercicio vuelve en el repaso.</div>'; };
+    }
+    $("#screen .editor").classList.remove("shake"); void $("#screen .editor").offsetWidth; $("#screen .editor").classList.add("shake");
+    return;
+  }
+  let ok;
+  if (e.t === "mc" || e.t === "out") ok = lesson.answer === 0;
+  else if (e.t === "fill") ok = lesson.answer.every((v, i) => v === e.a[i]);
+  else if (e.t === "order") ok = lesson.answer.every((v, i) => e.lines[v] === e.lines[i]);
+  if (e.t === "mc" || e.t === "out") {
+    document.querySelectorAll(".opt").forEach(b => { const i = +b.dataset.i; if (i === 0) b.classList.add("right"); else if (b.classList.contains("sel")) b.classList.add("wrong"); });
+    $("#opts").classList.add("locked");
+  }
+  feedback(item, ok);
+}
+function feedback(item, ok) {
+  const e = item.ex, foot = $("#lfoot");
+  if (ok) {
+    lesson.correct++;
+    if (lesson.review && !item.sawSolution) S.mistakes = S.mistakes.filter(x => x !== item.id);
+    if (item.sawSolution && !S.mistakes.includes(item.id)) S.mistakes.push(item.id);
+  } else {
+    lesson.missed.add(item.id);
+    if (!S.mistakes.includes(item.id)) S.mistakes.push(item.id);
+    if (!lesson.review) loseHeart();
+  }
+  const praise = ["¡Bien!", "¡Correcto!", "¡Eso!", "¡Muy bien!", "¡Perfecto!"];
+  foot.className = "l-foot " + (ok ? "ok" : "bad");
+  foot.innerHTML = `<div class="wrap">
+    <div class="fb-title">${ok ? I.ok + praise[Math.floor(Math.random() * praise.length)] : I.x + "Respuesta correcta:"}</div>
+    ${ok ? "" : `<div class="fb-ans">${esc(correctText(e))}</div>`}
+    ${e.why ? `<p class="fb-text">${inline(e.why)}</p>` : ""}
+    <button class="btn wide ${ok ? "ok" : "bad"}" id="cont">Continuar</button></div>`;
+  const bar = document.querySelector(".l-bar > i"); if (bar) bar.style.width = Math.round(100 * lesson.correct / lesson.total) + "%";
+  const hs = document.querySelector(".l-top .stat.hearts"); if (hs) hs.innerHTML = I.heart + heartsNow();
+  const cont = $("#cont"); cont.focus({ preventScroll: true });
+  cont.onclick = () => {
+    const it = lesson.queue.shift();
+    if (!ok) lesson.queue.push({ ex: it.ex, id: it.id, redo: true });
+    if (!lesson.review && heartsNow() <= 0 && lesson.queue.length) { save(); renderNoHearts(); return; }
+    renderLesson();
+    const b = $("#lbody"); if (b) b.scrollTop = 0;
+  };
+}
+function finishLesson() {
+  const L = lesson, t = today();
+  const perfect = L.missed.size === 0;
+  let xp;
+  if (L.review) { xp = 5; gainHeart(); }
+  else {
+    xp = 10 + (perfect ? 5 : 0);
+    const prev = S.done[L.l.id];
+    S.done[L.l.id] = { at: Date.now(), best: Math.max(prev ? prev.best : 0, Math.round(100 * (L.total - L.missed.size) / L.total)) };
+  }
+  S.xp += xp;
+  if (S.streak.last !== t) { S.streak = { n: S.streak.last === yesterday() ? S.streak.n + 1 : 1, last: t }; }
+  S.day = { date: t, count: todayCount() + 1 };
+  save();
+  const acc = Math.round(100 * (L.total - L.missed.size) / L.total);
+  lesson = null;
+  app.innerHTML = `<div class="screen"><div class="wrap result">
+    <div class="big-icon" style="color:var(--sun)">${I.star}</div>
+    <h1>${L.review ? "Repaso terminado" : perfect ? "¡Lección perfecta!" : "¡Lección completa!"}</h1>
+    <p>${L.review ? "Recuperaste una vida." : esc(L.l.title)}</p>
+    <div class="tiles">
+      <div class="tile" style="--c:var(--sun-deep)"><div class="h">XP</div><div class="n">+${xp}</div></div>
+      <div class="tile" style="--c:var(--ok)"><div class="h">Precisión</div><div class="n">${acc}%</div></div>
+      <div class="tile" style="--c:var(--bad)"><div class="h">Racha</div><div class="n">${S.streak.n}</div></div>
+    </div>
+    <button class="btn wide" id="cont" style="max-width:420px">Continuar</button>
+  </div></div>`;
+  $("#cont").onclick = () => { renderHome(); window.scrollTo(0, 0); };
+  $("#cont").focus({ preventScroll: true });
+}
+function renderNoHearts() {
+  lesson = null;
+  const mist = S.mistakes.length;
+  app.innerHTML = `<div class="screen"><div class="wrap result">
+    <div class="big-icon" style="color:var(--bad)">${I.heart}</div>
+    <h1 style="color:var(--bad)">Te quedaste sin vidas</h1>
+    <p>Recuperás una vida cada 30 minutos (la próxima en ${nextHeartIn()} min). Repasar tus errores también te devuelve una.</p>
+    ${mist ? '<button class="btn wide sun" id="rv" style="max-width:420px">Repasar errores</button>' : ""}
+    <button class="btn ghost wide" id="home" style="max-width:420px">Volver al inicio</button>
+  </div></div>`;
+  const rv = $("#rv"); if (rv) rv.onclick = startReview;
+  $("#home").onclick = () => renderHome();
+}
+
+// Teclado en la computadora: 1-4 eligen opción, Enter comprueba o continúa.
+document.addEventListener("keydown", ev => {
+  if (!lesson || ev.target.tagName === "TEXTAREA") return;
+  if (/^[1-4]$/.test(ev.key)) { const b = document.querySelectorAll(".opts:not(.locked) .opt")[+ev.key - 1]; if (b) b.click(); }
+  else if (ev.key === "Enter") {
+    const c = $("#cont") || (lesson.stage === "intro" ? $("#go") : null) || $("#check");
+    if (c && !c.disabled && document.activeElement !== c) { ev.preventDefault(); c.click(); }
+  }
+});
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && !lesson && remote.ref) remote.ref.get().then(s => { if (s.exists && adopt(s.data())) renderHome(); }).catch(() => {}); });
+
+renderHome();
+initRemote();
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+}
+})();
+
+</script>
+
+</body>
+</html>
