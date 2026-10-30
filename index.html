@@ -151,6 +151,10 @@ main.home { padding-block: 18px 48px; display: flex; flex-direction: column; gap
 .cheat-item pre { margin: 2px 0 0; background: var(--code-bg); color: var(--code-ink); border-radius: 10px; padding: 8px 10px; font-family: var(--f-code); font-size: 13px; overflow-x: auto; white-space: pre; }
 .cheat-empty { margin: 0; color: var(--muted); font-size: 15px; padding: 8px 2px; }
 .upd-toast { position: fixed; z-index: 70; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); background: var(--ink); color: var(--bg); border: 0; border-radius: 12px; padding: 10px 14px; font-weight: 700; font-size: 14px; max-width: calc(100vw - 32px); }
+.update { display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; padding-top: 4px; }
+.upd-info, .upd-msg { margin: 0; font-size: 13px; color: var(--muted); }
+.upd-info b { color: var(--ink); font-weight: 700; }
+.update .btn { max-width: 320px; }
 .sync { text-align: center; color: var(--muted); font-size: 13px; }
 .sync .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--lock-ink); margin-right: 6px; vertical-align: middle; }
 .sync.on .dot { background: var(--ok); }
@@ -1118,13 +1122,16 @@ function renderHome() {
     <p>Copiá tu código acá y pegalo en el otro dispositivo (por ejemplo, de la computadora al iPhone). Se combinan las lecciones hechas en los dos.</p>
     <div class="ed-actions"><button class="btn ghost small" id="expBtn">Copiar mi código</button><button class="btn ghost small" id="impBtn">Pegar un código</button></div>
     <div id="pbox"></div></section>`;
-  html += '<p class="sync" id="sync"></p></main>';
+  html += '<p class="sync" id="sync"></p>';
+  html += `<section class="update"><p class="upd-info">Versión instalada: <b>${esc(buildLabel(APP_BUILD))}</b></p>
+    <button class="btn ghost wide small" id="updBtn">Buscar actualización</button><p class="upd-msg" id="updMsg" aria-live="polite"></p></section></main>`;
   app.innerHTML = html;
   renderSync();
   app.querySelectorAll("[data-start]").forEach(b => b.onclick = () => startLesson(b.dataset.start));
   const rb = $("#reviewBtn"); if (rb) rb.onclick = startReview;
   app.querySelectorAll("[data-node]").forEach(b => b.onclick = (ev) => { ev.stopPropagation(); togglePop(b); });
   $("#expBtn").onclick = exportProgress;
+  $("#updBtn").onclick = checkUpdate;
   $("#impBtn").onclick = importForm;
 }
 function encodeProgress() { return "SERP1." + btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
@@ -1469,6 +1476,28 @@ document.addEventListener("keydown", ev => {
   }
 });
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && !lesson && remote.ref) remote.ref.get().then(s => { if (s.exists && adopt(s.data())) renderHome(); }).catch(() => {}); });
+
+// ---------- Actualización ----------
+const APP_BUILD = "2026-10-30T15:02";
+const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+function buildLabel(b) {
+  const m = String(b).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  return m ? `${+m[3]} de ${MESES[+m[2] - 1]} de ${m[1]}, ${m[4]}:${m[5]} h` : b;
+}
+async function checkUpdate() {
+  const btn = $("#updBtn"), msg = $("#updMsg");
+  btn.disabled = true; msg.textContent = "Buscando…";
+  let remoteBuild = null;
+  try { const r = await fetch("version.json?t=" + Date.now(), { cache: "no-store" }); if (r.ok) remoteBuild = (await r.json()).build; } catch (e) {}
+  if (!remoteBuild) { msg.textContent = "No hay conexión. Conectate a internet y probá de nuevo."; btn.disabled = false; return; }
+  if (remoteBuild === APP_BUILD) { msg.textContent = "Ya tenés la última versión."; btn.disabled = false; return; }
+  msg.textContent = "Descargando la versión del " + buildLabel(remoteBuild) + "…";
+  try {
+    if ("serviceWorker" in navigator) { const reg = await navigator.serviceWorker.getRegistration(); if (reg) await reg.update(); }
+    if (window.caches) { const keys = await caches.keys(); await Promise.all(keys.map(k => caches.delete(k))); }
+  } catch (e) {}
+  location.reload();
+}
 
 // ---------- Machete ----------
 function cheatUnlocked() {
