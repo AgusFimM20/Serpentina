@@ -1,4 +1,4 @@
-# Serpentina: curso de Python estilo Duolingo (días 1 a 5 de 30 Days Of Python)
+# Serpentina: curso de Python estilo Duolingo (días 1 a 10 de 30 Days Of Python)
 
 Esta carpeta es la app completa. Para instalarla en el iPhone hay que subirla a un sitio web (por ejemplo Netlify Drop o GitHub Pages). Después:
 - iPhone: abrí el enlace en Safari, tocá Compartir y después "Agregar a pantalla de inicio". Abrila siempre desde ese ícono.

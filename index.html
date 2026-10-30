@@ -61,7 +61,8 @@ body { background: var(--bg); color: var(--ink); font-family: var(--f-body); fon
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--surface); }
 button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 button:focus-visible, textarea:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
-code, pre, .mono { font-family: var(--f-code); }
+code, pre, .mono, textarea, .chip, .slot { font-family: var(--f-code); font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+.chip, .slot { font-family: var(--f-code); }
 .wrap { max-width: 620px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 h1, h2, h3 { font-family: var(--f-display); font-weight: 600; text-wrap: balance; margin: 0; }
 
@@ -129,6 +130,27 @@ main.home { padding-block: 18px 48px; display: flex; flex-direction: column; gap
 .soon li b { font-family: var(--f-display); font-weight: 600; color: var(--lock-ink); font-variant-numeric: tabular-nums; min-width: 22px; }
 .pcode { width: 100%; font-family: var(--f-code); font-size: 13px; padding: 10px; border-radius: 10px; border: 2px solid var(--line); background: var(--surface-2); color: var(--ink); resize: vertical; word-break: break-all; }
 .pmsg { margin: 0; font-size: 14px; color: var(--muted); }
+.cheat-btn { display: inline-flex; align-items: center; gap: 4px; border: 2px solid var(--line); background: var(--surface); color: var(--blue); border-radius: 12px; padding: 5px 8px; font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums; min-height: 38px; }
+.cheat-btn svg { width: 20px; height: 20px; }
+.cheat-btn[aria-expanded="true"] { background: var(--blue); color: #fff; border-color: var(--blue); }
+.l-top .cheat-btn { margin-left: 2px; }
+.cheat { position: fixed; z-index: 60; top: calc(env(safe-area-inset-top, 0px) + 60px); right: max(12px, env(safe-area-inset-right, 0px)); width: min(400px, calc(100vw - 24px)); max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 80px); display: flex; flex-direction: column; background: var(--surface); border: 2px solid var(--line); border-radius: 18px; box-shadow: 0 18px 40px rgba(10,20,40,.28); overflow: hidden; animation: drop .16s ease-out; }
+@keyframes drop { from { opacity: 0; transform: translateY(-8px); } }
+.cheat-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 14px 14px 6px 16px; }
+.cheat-head h2 { font-size: 21px; color: var(--blue); }
+.cheat-head p { margin: 0; font-size: 13px; color: var(--muted); }
+.cheat-search { margin: 4px 14px 10px; padding: 10px 12px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface-2); color: var(--ink); font: inherit; font-size: 16px; }
+.cheat-list { overflow-y: auto; padding: 0 14px 14px; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
+.cheat details { border: 2px solid var(--line); border-radius: 14px; background: var(--surface-2); }
+.cheat summary { cursor: pointer; padding: 10px 12px; font-family: var(--f-display); font-weight: 600; font-size: 16px; display: flex; justify-content: space-between; gap: 8px; list-style: none; }
+.cheat summary::-webkit-details-marker { display: none; }
+.cheat summary span { font-family: var(--f-body); font-size: 13px; font-weight: 800; color: var(--muted); }
+.cheat-item { padding: 10px 12px; border-top: 2px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.cheat-item code { font-weight: 600; color: var(--blue); font-size: 15px; white-space: pre-wrap; word-break: break-word; }
+.cheat-item p { margin: 0; font-size: 14px; }
+.cheat-item pre { margin: 2px 0 0; background: var(--code-bg); color: var(--code-ink); border-radius: 10px; padding: 8px 10px; font-family: var(--f-code); font-size: 13px; overflow-x: auto; white-space: pre; }
+.cheat-empty { margin: 0; color: var(--muted); font-size: 15px; padding: 8px 2px; }
+.upd-toast { position: fixed; z-index: 70; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); background: var(--ink); color: var(--bg); border: 0; border-radius: 12px; padding: 10px 14px; font-weight: 700; font-size: 14px; max-width: calc(100vw - 32px); }
 .sync { text-align: center; color: var(--muted); font-size: 13px; }
 .sync .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--lock-ink); margin-right: 6px; vertical-align: middle; }
 .sync.on .dot { background: var(--ok); }
@@ -592,11 +614,213 @@ print("Ella dijo \"hola\"")  # \": comillas adentro del texto` },
       { t: "code", q: "Ordená la lista y mostrá la edad mínima y la máxima, en dos líneas.", start: "edades = [19, 22, 19, 24, 20, 25, 26, 24, 25, 24]\n", test: "_out.strip().split('\\n')[-2:] == ['19', '26']", hint: "Después de edades.sort(), la mínima es edades[0] y la máxima edades[-1].", sol: "edades = [19, 22, 19, 24, 20, 25, 26, 24, 25, 24]\nedades.sort()\nprint(edades[0])\nprint(edades[-1])" },
       { t: "code", q: "Mostrá la mediana: el promedio de los dos valores del medio después de ordenar.", start: "edades = [19, 22, 19, 24, 20, 25, 26, 24, 25, 24]\n", test: "_out.strip() in ('24.0', '24')", hint: "La lista tiene 10 elementos. Ordenala y promediá los índices 4 y 5.", sol: "edades = [19, 22, 19, 24, 20, 25, 26, 24, 25, 24]\nedades.sort()\nprint((edades[4] + edades[5]) / 2)" }
     ] }
+] },
+{ day: 6, title: "Tuplas", lessons: [
+  { id: "d6l1", title: "Crear tuplas",
+    intro: [
+      "Una tupla es como una lista, pero no se puede modificar después de crearla. Se escribe entre paréntesis.",
+      { code: 'frutas = ("banana", "naranja", "mango")\nvacia = ()\nuna = ("solo",)   # con un elemento lleva coma\nprint(len(frutas))  # 3\nprint(frutas[0])    # banana\nprint(frutas[-1])   # mango\nprint(frutas[0:2])  # (\'banana\', \'naranja\')' },
+      "Si intentás cambiar un elemento, `frutas[0] = \"kiwi\"`, Python da TypeError."
+    ],
+    ex: [
+      { t: "mc", q: "¿Qué diferencia principal tiene una tupla con una lista?", opts: ["No se puede modificar después de crearla", "Solo guarda números", "No tiene orden"] },
+      { t: "out", code: "t = (1, 2, 3)\nprint(t[1])", opts: ["2", "1", "(2)"] },
+      { t: "out", code: 't = ("a", "b", "c")\nprint(t[-1])', opts: ["c", "a", "Error"] },
+      { t: "out", code: "t = (10, 20, 30, 40)\nprint(t[1:3])", opts: ["(20, 30)", "[20, 30]", "(20, 30, 40)"], why: "Recortar una tupla devuelve otra tupla." },
+      { t: "out", code: "t = (1, 2)\nt[0] = 5\nprint(t)", opts: ["TypeError (las tuplas no se modifican)", "(5, 2)", "(1, 2)"], err: "TypeError" },
+      { t: "out", code: 'print(type(("hola",)))', opts: ["<class 'tuple'>", "<class 'str'>", "<class 'list'>"], why: "La coma es la que crea la tupla." },
+      { t: "out", code: 'print(type(("hola")))', opts: ["<class 'str'>", "<class 'tuple'>"], why: "Sin coma, los paréntesis no hacen nada y queda un string." },
+      { t: "fill", q: "Completá para crear una tupla.", code: 'hermanos = ___"Ana", "Luis"___\nprint(hermanos)', bank: ["(", ")", "[", "]"], a: ["(", ")"] },
+      { t: "code", q: "Creá una tupla hermanas y otra hermanos, con dos nombres cada una. Mostrá cuántos elementos hay en total sumando sus len().", start: "", test: "isinstance(hermanas, tuple) and isinstance(hermanos, tuple) and _out.strip() == str(len(hermanas) + len(hermanos))", hint: "print(len(hermanas) + len(hermanos))", sol: 'hermanas = ("Ana", "Sol")\nhermanos = ("Luis", "Juan")\nprint(len(hermanas) + len(hermanos))' }
+    ] },
+  { id: "d6l2", title: "Unir, convertir y buscar",
+    intro: [
+      "Las tuplas se unen con `+`. Para cambiar una, se convierte a lista, se modifica y se vuelve a tupla.",
+      { code: 'a = (1, 2)\nb = (3, 4)\nprint(a + b)          # (1, 2, 3, 4)\nlista = list(a)       # [1, 2]\nlista.append(9)\na = tuple(lista)      # (1, 2, 9)\nprint(2 in a)         # True\nprint((1, 2, 1).count(1))  # 2\nprint((1, 2, 1).index(2))  # 1' }
+    ],
+    ex: [
+      { t: "out", code: "print((1, 2) + (3,))", opts: ["(1, 2, 3)", "(1, 2, (3,))", "(4, 2)"] },
+      { t: "out", code: 'print(list(("a", "b")))', opts: ["['a', 'b']", "('a', 'b')", "ab"] },
+      { t: "out", code: 'print("mango" in ("banana", "mango"))', opts: ["True", "False"] },
+      { t: "out", code: "print((1, 2, 1, 1).count(1))", opts: ["3", "1", "2"] },
+      { t: "out", code: 'print(("x", "y", "z").index("z"))', opts: ["2", "3", "z"] },
+      { t: "mc", q: "¿Cómo agregás un elemento a una tupla?", opts: ["La convertís a lista, agregás y volvés a tupla", "Con append()", "Con insert()"] },
+      { t: "order", q: 'Ordená: convertir la tupla a lista, agregar "kiwi", volver a tupla y mostrarla.', lines: ['frutas = ("banana", "mango")', "lista = list(frutas)", 'lista.append("kiwi")', "frutas = tuple(lista)", "print(frutas)"] },
+      { t: "code", q: "Uní las tres tuplas en una sola llamada comida_casa y mostrala.", start: 'frutas = ("banana", "mango")\nverduras = ("papa", "zapallo")\nanimales = ("vaca", "pollo")\n', test: "comida_casa == frutas + verduras + animales and len(_out.strip()) > 0", hint: "comida_casa = frutas + verduras + animales", sol: 'frutas = ("banana", "mango")\nverduras = ("papa", "zapallo")\nanimales = ("vaca", "pollo")\ncomida_casa = frutas + verduras + animales\nprint(comida_casa)' },
+      { t: "code", q: 'Mostrá si "Islandia" está en la tupla y después si "Estonia" está (dos líneas, True o False).', start: 'paises = ("Dinamarca", "Finlandia", "Islandia", "Noruega", "Suecia")\n', expect: "True\nFalse", hint: 'print("Islandia" in paises)', sol: 'paises = ("Dinamarca", "Finlandia", "Islandia", "Noruega", "Suecia")\nprint("Islandia" in paises)\nprint("Estonia" in paises)' }
+    ] }
+] },
+{ day: 7, title: "Conjuntos", lessons: [
+  { id: "d7l1", title: "Crear conjuntos",
+    intro: [
+      "Un conjunto (set) guarda valores sin repetir y sin orden. Se escribe entre llaves. Como no tiene orden, no tiene índices.",
+      { code: 'frutas = {"banana", "naranja", "mango"}\nvacio = set()        # {} sería un diccionario\nprint(len(frutas))   # 3\nprint("mango" in frutas)  # True\nfrutas.add("uva")\nfrutas.update(["kiwi", "pera"])\nfrutas.remove("banana")   # error si no existe\nfrutas.discard("melón")   # no da error\nprint(set([1, 1, 2]))     # {1, 2}' }
+    ],
+    ex: [
+      { t: "mc", q: "¿Qué pasa con los valores repetidos en un conjunto?", opts: ["Se guardan una sola vez", "Se guardan todos", "Da error"] },
+      { t: "out", code: "print(len({1, 2, 2, 3, 3}))", opts: ["3", "5", "2"] },
+      { t: "out", code: "print(set([1, 1, 2]))", opts: ["{1, 2}", "[1, 2]", "{1, 1, 2}"] },
+      { t: "mc", q: "¿Cómo se crea un conjunto vacío?", opts: ["set()", "{}", "[]"], mono: true, why: "{} crea un diccionario vacío." },
+      { t: "out", code: "s = {1, 2}\ns.add(3)\nprint(len(s))", opts: ["3", "2", "Error"] },
+      { t: "out", code: "s = {1, 2}\nprint(s[0])", opts: ["TypeError (los conjuntos no tienen índices)", "1", "2"], err: "TypeError" },
+      { t: "out", code: "s = {1, 2}\ns.discard(5)\nprint(s)", opts: ["{1, 2}", "Error", "{1, 2, 5}"], why: "discard no da error si el valor no está. remove sí." },
+      { t: "fill", q: "Completá para agregar un elemento.", code: 's = {"a"}\ns.___("b")\nprint(len(s))', bank: ["add", "append", "insert"], a: ["add"], why: "Los conjuntos usan add. append es de las listas." },
+      { t: "code", q: "La lista de edades tiene repetidos. Convertila a conjunto y mostrá cuántas edades distintas hay.", start: "edades = [22, 19, 24, 25, 26, 24, 25, 24]\n", expect: "5", hint: "print(len(set(edades)))", sol: "edades = [22, 19, 24, 25, 26, 24, 25, 24]\nprint(len(set(edades)))" }
+    ] },
+  { id: "d7l2", title: "Operaciones entre conjuntos",
+    intro: [
+      "Los conjuntos se combinan como en matemática:",
+      { code: "a = {1, 2, 3, 4}\nb = {3, 4, 5}\na.union(b)                 # {1, 2, 3, 4, 5}: todo\na.intersection(b)          # {3, 4}: lo que está en los dos\na.difference(b)            # {1, 2}: lo de a que no está en b\na.symmetric_difference(b)  # {1, 2, 5}: lo que no comparten\n{1, 2}.issubset(a)         # True: está todo adentro de a\na.isdisjoint({9})          # True: no comparten nada" },
+      "Para mostrar un conjunto ordenado se usa `sorted()`, que devuelve una lista."
+    ],
+    ex: [
+      { t: "out", code: "a = {1, 2, 3}\nb = {3, 4}\nprint(sorted(a.union(b)))", opts: ["[1, 2, 3, 4]", "[3]", "[1, 2, 3, 3, 4]"] },
+      { t: "out", code: "a = {1, 2, 3}\nb = {3, 4}\nprint(a.intersection(b))", opts: ["{3}", "{1, 2, 4}", "{1, 2, 3, 4}"] },
+      { t: "out", code: "a = {1, 2, 3}\nb = {3, 4}\nprint(sorted(a.difference(b)))", opts: ["[1, 2]", "[4]", "[3]"] },
+      { t: "out", code: "a = {1, 2, 3}\nb = {3, 4}\nprint(sorted(a.symmetric_difference(b)))", opts: ["[1, 2, 4]", "[3]", "[1, 2, 3, 4]"] },
+      { t: "out", code: "print({1, 2}.issubset({1, 2, 3}))", opts: ["True", "False"] },
+      { t: "out", code: "print({1, 2}.isdisjoint({3, 4}))", opts: ["True", "False"], why: "No comparten ningún elemento." },
+      { t: "mc", q: "¿Qué método da los elementos que están en los dos conjuntos?", opts: ["intersection()", "union()", "difference()"], mono: true },
+      { t: "code", q: "Mostrá cuántos elementos tiene la unión de A y B.", start: "A = {19, 22, 24, 20, 25, 26}\nB = {19, 22, 20, 25, 26, 24, 28, 27}\n", expect: "8", hint: "print(len(A.union(B)))", sol: "A = {19, 22, 24, 20, 25, 26}\nB = {19, 22, 20, 25, 26, 24, 28, 27}\nprint(len(A.union(B)))" },
+      { t: "code", q: "Mostrá la intersección de A y B, ordenada con sorted().", start: "A = {19, 22, 24, 20, 25, 26}\nB = {19, 22, 20, 25, 26, 24, 28, 27}\n", expect: "[19, 20, 22, 24, 25, 26]", hint: "print(sorted(A.intersection(B)))", sol: "A = {19, 22, 24, 20, 25, 26}\nB = {19, 22, 20, 25, 26, 24, 28, 27}\nprint(sorted(A.intersection(B)))" }
+    ] }
+] },
+{ day: 8, title: "Diccionarios", lessons: [
+  { id: "d8l1", title: "Crear y leer",
+    intro: [
+      "Un diccionario guarda pares clave: valor entre llaves. Se lee con la clave entre corchetes.",
+      { code: 'persona = {\n    "nombre": "Ana",\n    "edad": 30,\n    "skills": ["Python", "SQL"]\n}\nprint(persona["nombre"])        # Ana\nprint(len(persona))             # 3\nprint("edad" in persona)        # True\nprint(persona.get("ciudad"))    # None\nprint(persona.get("ciudad", "sin dato"))  # sin dato' },
+      "Con corchetes, una clave que no existe da KeyError. `get()` devuelve None o el valor que le pases."
+    ],
+    ex: [
+      { t: "out", code: 'p = {"nombre": "Ana", "edad": 30}\nprint(p["edad"])', opts: ["30", "edad", "Error"] },
+      { t: "out", code: 'p = {"nombre": "Ana"}\nprint(len(p))', opts: ["1", "2", "4"], why: "len cuenta los pares clave: valor." },
+      { t: "out", code: 'p = {"nombre": "Ana"}\nprint(p["ciudad"])', opts: ["KeyError (esa clave no existe)", "None", "ciudad"], err: "KeyError" },
+      { t: "out", code: 'p = {"nombre": "Ana"}\nprint(p.get("ciudad"))', opts: ["None", "KeyError", "ciudad"] },
+      { t: "out", code: 'p = {"nombre": "Ana"}\nprint(p.get("ciudad", "sin dato"))', opts: ["sin dato", "None", "Ana"] },
+      { t: "out", code: 'p = {"nombre": "Ana"}\nprint("nombre" in p)', opts: ["True", "False"], why: "in busca entre las claves." },
+      { t: "out", code: 'p = {"skills": ["Python", "SQL"]}\nprint(p["skills"][1])', opts: ["SQL", "Python", "Error"] },
+      { t: "mc", q: 'En {"edad": 30}, ¿cuál es la clave?', opts: ['"edad"', "30", "{}"], mono: true },
+      { t: "code", q: "Creá un diccionario perro con las claves nombre, color, raza, patas y edad. Mostrá el nombre.", start: "", test: "isinstance(perro, dict) and all(k in perro for k in ['nombre', 'color', 'raza', 'patas', 'edad']) and str(perro['nombre']) in _out", hint: 'perro = {"nombre": "Toby", "color": ..., ...} y después print(perro["nombre"])', sol: 'perro = {"nombre": "Toby", "color": "marrón", "raza": "caniche", "patas": 4, "edad": 3}\nprint(perro["nombre"])' }
+    ] },
+  { id: "d8l2", title: "Modificar y recorrer",
+    intro: [
+      "Asignar a una clave que existe la modifica. Asignar a una nueva la agrega.",
+      { code: 'p = {"nombre": "Ana", "edad": 30}\np["edad"] = 31          # modifica\np["ciudad"] = "Rosario"  # agrega\np.pop("ciudad")          # saca esa clave\ndel p["edad"]            # también saca\nlist(p.keys())           # [\'nombre\']\nlist(p.values())         # [\'Ana\']\nlist(p.items())          # [(\'nombre\', \'Ana\')]\ncopia = p.copy()\np.clear()                # lo vacía' }
+    ],
+    ex: [
+      { t: "out", code: 'p = {"edad": 30}\np["edad"] = 31\nprint(p)', opts: ["{'edad': 31}", "{'edad': 30}", "{'edad': 30, 'edad': 31}"], why: "Las claves no se repiten: se reemplaza el valor." },
+      { t: "out", code: 'p = {"a": 1}\np["b"] = 2\nprint(p)', opts: ["{'a': 1, 'b': 2}", "{'a': 1}", "Error"] },
+      { t: "out", code: 'p = {"a": 1, "b": 2}\np.pop("a")\nprint(p)', opts: ["{'b': 2}", "{'a': 1}", "{}"] },
+      { t: "out", code: 'p = {"a": 1, "b": 2}\nprint(list(p.keys()))', opts: ["['a', 'b']", "[1, 2]", "['a', 1, 'b', 2]"] },
+      { t: "out", code: 'p = {"a": 1, "b": 2}\nprint(list(p.values()))', opts: ["[1, 2]", "['a', 'b']", "3"] },
+      { t: "out", code: 'p = {"a": 1}\nprint(list(p.items()))', opts: ["[('a', 1)]", "['a', 1]", "{'a': 1}"], why: "items() da pares (clave, valor) como tuplas." },
+      { t: "fill", q: 'Completá para agregar la ciudad "Córdoba".', code: 'p = {"nombre": "Ana"}\np[___] = "Córdoba"\nprint(p)', bank: ['"ciudad"', "ciudad", ".ciudad"], a: ['"ciudad"'], why: "La clave es un texto, así que va entre comillas." },
+      { t: "code", q: 'Agregale a estudiante la clave skills con una lista vacía. Después agregá "Python" a esa lista y mostrá la lista.', start: 'estudiante = {"nombre": "Ana", "edad": 30}\n', test: "estudiante['skills'] == ['Python'] and \"['Python']\" in _out", hint: 'estudiante["skills"] = [] y después estudiante["skills"].append("Python")', sol: 'estudiante = {"nombre": "Ana", "edad": 30}\nestudiante["skills"] = []\nestudiante["skills"].append("Python")\nprint(estudiante["skills"])' },
+      { t: "code", q: "Mostrá las claves y después los valores de estudiante, como listas (dos líneas).", start: 'estudiante = {"nombre": "Ana", "edad": 30}\n', expect: "['nombre', 'edad']\n['Ana', 30]", hint: "print(list(estudiante.keys()))", sol: 'estudiante = {"nombre": "Ana", "edad": 30}\nprint(list(estudiante.keys()))\nprint(list(estudiante.values()))' }
+    ] }
+] },
+{ day: 9, title: "Condicionales", lessons: [
+  { id: "d9l1", title: "if y else",
+    intro: [
+      "`if` ejecuta un bloque solo si la condición es verdadera. `else` ejecuta otro bloque si no lo es. La línea termina en dos puntos y el bloque va con 4 espacios.",
+      { code: 'edad = 20\nif edad >= 18:\n    print("Podés votar")\nelse:\n    print("Todavía no")' }
+    ],
+    ex: [
+      { t: "out", code: 'x = 5\nif x > 3:\n    print("grande")', opts: ["grande", "No muestra nada", "x"] },
+      { t: "out", code: 'x = 1\nif x > 3:\n    print("grande")\nelse:\n    print("chico")', opts: ["chico", "grande", "grande\nchico"] },
+      { t: "out", code: 'x = 1\nif x > 3:\n    print("A")\nprint("B")', opts: ["B", "A\nB", "No muestra nada"], why: 'print("B") no tiene espacios, así que está afuera del if y siempre se ejecuta.' },
+      { t: "mc", q: "¿Qué va al final de la línea del if?", opts: ["Dos puntos (:)", "Punto y coma (;)", "Nada"] },
+      { t: "fill", q: "Completá el if y el else.", code: 'edad = 20\nif edad >= 18___\n    print("Mayor")\n___:\n    print("Menor")', bank: [":", "else", "elif", ";"], a: [":", "else"] },
+      { t: "order", q: "Ordená para que diga si n es par o impar.", lines: ["n = 4", "if n % 2 == 0:", '    print("par")', "else:", '    print("impar")'] },
+      { t: "code", q: "Si la edad es 18 o más, mostrá: Podés manejar. Si no, mostrá: Te faltan X años (con X = 18 menos la edad).", inputs: ["15"], start: 'edad = int(input("Edad: "))\n', test: "'Te faltan 3 años' in _out and 'if' in _src", hint: 'En el else: print(f"Te faltan {18 - edad} años")', sol: 'edad = int(input("Edad: "))\nif edad >= 18:\n    print("Podés manejar")\nelse:\n    print(f"Te faltan {18 - edad} años")' }
+    ] },
+  { id: "d9l2", title: "elif y condiciones",
+    intro: [
+      "`elif` agrega más casos. Python revisa de arriba hacia abajo y ejecuta solo el primero que se cumple.",
+      { code: 'nota = 75\nif nota >= 80:\n    print("A")\nelif nota >= 70:\n    print("B")\nelif nota >= 60:\n    print("C")\nelse:\n    print("D")\n# muestra: B' },
+      "Versión corta en una línea, y condiciones combinadas con and/or:",
+      { code: 'print("par") if n % 2 == 0 else print("impar")\nif edad >= 18 and tiene_dni:\n    print("Puede votar")' }
+    ],
+    ex: [
+      { t: "out", code: 'nota = 75\nif nota >= 80:\n    print("A")\nelif nota >= 70:\n    print("B")\nelse:\n    print("C")', opts: ["B", "A", "B\nC"] },
+      { t: "out", code: 'x = 0\nif x > 0:\n    print("positivo")\nelif x < 0:\n    print("negativo")\nelse:\n    print("cero")', opts: ["cero", "positivo", "negativo"] },
+      { t: "out", code: 'n = 10\nprint("par") if n % 2 == 0 else print("impar")', opts: ["par", "impar", "10"] },
+      { t: "out", code: 'edad = 25\ndni = False\nif edad >= 18 and dni:\n    print("Pasa")\nelse:\n    print("No pasa")', opts: ["No pasa", "Pasa"], why: "Con and tienen que cumplirse las dos, y dni es False." },
+      { t: "out", code: 'dia = "domingo"\nif dia == "sábado" or dia == "domingo":\n    print("finde")\nelse:\n    print("semana")', opts: ["finde", "semana"] },
+      { t: "mc", q: "En un if con varios elif y un else, ¿cuántos bloques se ejecutan como máximo?", opts: ["Uno", "Todos los que se cumplan", "Dos"] },
+      { t: "code", q: "Con nota = 85, mostrá A si es 80 o más, B si es 70 o más, C si es 60 o más y D en otro caso. Usá elif.", start: "nota = 85\n", test: "_out.strip() == 'A' and 'elif' in _src", hint: "if nota >= 80: ... elif nota >= 70: ...", sol: 'nota = 85\nif nota >= 80:\n    print("A")\nelif nota >= 70:\n    print("B")\nelif nota >= 60:\n    print("C")\nelse:\n    print("D")' },
+      { t: "code", q: "Mostrá la estación en Argentina según el mes. Diciembre, enero o febrero: Verano. Marzo, abril o mayo: Otoño. Junio, julio o agosto: Invierno. El resto: Primavera.", start: 'mes = "marzo"\n', test: "_out.strip() == 'Otoño' and 'if' in _src", hint: 'if mes in ["diciembre", "enero", "febrero"]: ...', sol: 'mes = "marzo"\nif mes in ["diciembre", "enero", "febrero"]:\n    print("Verano")\nelif mes in ["marzo", "abril", "mayo"]:\n    print("Otoño")\nelif mes in ["junio", "julio", "agosto"]:\n    print("Invierno")\nelse:\n    print("Primavera")' }
+    ] },
+  { id: "d9l3", title: "if adentro de if",
+    intro: [
+      "Un if puede ir adentro de otro. La indentación indica a qué if pertenece cada else.",
+      { code: 'a = 4\nif a > 0:\n    if a % 2 == 0:\n        print("positivo y par")\n    else:\n        print("positivo e impar")\nelse:\n    print("cero o negativo")' }
+    ],
+    ex: [
+      { t: "out", code: 'a = 0\nif a > 0:\n    if a % 2 == 0:\n        print("positivo y par")\n    else:\n        print("positivo e impar")\nelse:\n    print("cero o negativo")', opts: ["cero o negativo", "positivo y par", "positivo e impar"] },
+      { t: "out", code: 'a = 3\nif a > 0:\n    if a % 2 == 0:\n        print("par")\n    else:\n        print("impar")', opts: ["impar", "par", "No muestra nada"] },
+      { t: "mc", q: "¿Cómo sabe Python a qué if pertenece un else?", opts: ["Por la indentación", "Por el orden alfabético", "Por los paréntesis"] },
+      { t: "code", q: 'Si usuario es "ana", revisá la clave: si es "1234" mostrá Bienvenida, si no, Clave incorrecta. Si el usuario no es "ana", mostrá Usuario desconocido.', start: 'usuario = "ana"\nclave = "1234"\n', test: "_out.strip() == 'Bienvenida' and _src.count('if') >= 2", hint: "Un if para el usuario y, adentro, otro if para la clave.", sol: 'usuario = "ana"\nclave = "1234"\nif usuario == "ana":\n    if clave == "1234":\n        print("Bienvenida")\n    else:\n        print("Clave incorrecta")\nelse:\n    print("Usuario desconocido")' },
+      { t: "code", q: "Mostrá a es mayor que b, a es menor que b o a es igual a b, según corresponda.", start: "a = 4\nb = 3\n", expect: "a es mayor que b", test: "'if' in _src and ('elif' in _src or 'else' in _src)", hint: 'if a > b: print("a es mayor que b") ...', sol: 'a = 4\nb = 3\nif a > b:\n    print("a es mayor que b")\nelif a < b:\n    print("a es menor que b")\nelse:\n    print("a es igual a b")' }
+    ] }
+] },
+{ day: 10, title: "Bucles", lessons: [
+  { id: "d10l1", title: "while",
+    intro: [
+      "`while` repite un bloque mientras la condición sea verdadera.",
+      { code: "n = 0\nwhile n < 5:\n    print(n)\n    n += 1\n# muestra 0, 1, 2, 3 y 4" },
+      "`break` corta el bucle. `continue` saltea lo que queda y pasa a la vuelta siguiente. Si la condición nunca se vuelve falsa, el bucle no termina: Serpentina lo corta después de 100.000 vueltas."
+    ],
+    ex: [
+      { t: "out", code: "n = 0\nwhile n < 3:\n    print(n)\n    n += 1", opts: ["0\n1\n2", "1\n2\n3", "0\n1\n2\n3"] },
+      { t: "out", code: "n = 3\nwhile n > 0:\n    n -= 1\nprint(n)", opts: ["0", "1", "3"] },
+      { t: "out", code: "n = 0\nwhile n < 10:\n    if n == 2:\n        break\n    print(n)\n    n += 1", opts: ["0\n1", "0\n1\n2", "0"] },
+      { t: "out", code: "n = 0\nwhile n < 4:\n    n += 1\n    if n == 2:\n        continue\n    print(n)", opts: ["1\n3\n4", "1\n2\n3\n4", "1\n3"], why: "Cuando n vale 2, continue saltea el print." },
+      { t: "mc", q: "¿Qué hace break?", opts: ["Termina el bucle", "Saltea a la vuelta siguiente", "Reinicia el bucle"] },
+      { t: "mc", q: "¿Qué pasa si en while n < 5 te olvidás de n += 1?", opts: ["El bucle no termina nunca", "Da error enseguida", "Se ejecuta una sola vez"] },
+      { t: "code", q: "Con un while, mostrá los números del 1 al 5, uno por línea.", start: "", expect: "1\n2\n3\n4\n5", test: "'while' in _src", hint: "Empezá con n = 1 y repetí mientras n <= 5.", sol: "n = 1\nwhile n <= 5:\n    print(n)\n    n += 1" }
+    ] },
+  { id: "d10l2", title: "for y range",
+    intro: [
+      "`for` recorre los elementos de una lista, un texto, una tupla o un diccionario, uno por vuelta.",
+      { code: 'for fruta in ["banana", "mango"]:\n    print(fruta)\nfor letra in "hola":\n    print(letra)' },
+      "`range()` genera números: `range(5)` va de 0 a 4, `range(1, 6)` de 1 a 5 y `range(0, 11, 2)` de 2 en 2.",
+      { code: 'for i in range(3):\n    print(i)        # 0, 1, 2\np = {"a": 1, "b": 2}\nfor clave, valor in p.items():\n    print(clave, valor)' }
+    ],
+    ex: [
+      { t: "out", code: "for x in [1, 2, 3]:\n    print(x * 2)", opts: ["2\n4\n6", "1\n2\n3", "6"] },
+      { t: "out", code: 'for letra in "hola":\n    print(letra)', opts: ["h\no\nl\na", "hola", "h o l a"] },
+      { t: "out", code: "print(list(range(5)))", opts: ["[0, 1, 2, 3, 4]", "[1, 2, 3, 4, 5]", "[0, 1, 2, 3, 4, 5]"], why: "range(5) empieza en 0 y no incluye el 5." },
+      { t: "out", code: "print(list(range(1, 4)))", opts: ["[1, 2, 3]", "[1, 2, 3, 4]", "[0, 1, 2, 3]"] },
+      { t: "out", code: "print(list(range(0, 10, 3)))", opts: ["[0, 3, 6, 9]", "[0, 3, 6]", "[3, 6, 9]"] },
+      { t: "out", code: "total = 0\nfor n in range(4):\n    total += n\nprint(total)", opts: ["6", "10", "4"], why: "0 + 1 + 2 + 3 = 6." },
+      { t: "out", code: 'p = {"a": 1, "b": 2}\nfor k, v in p.items():\n    print(k, v)', opts: ["a 1\nb 2", "a\nb", "1\n2"] },
+      { t: "fill", q: "Completá para repetir 3 veces.", code: "for i in ___(3):\n    print(i)", bank: ["range", "len", "list"], a: ["range"] },
+      { t: "code", q: "Con un for y range, mostrá los números del 0 al 10, uno por línea.", start: "", expect: "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10", test: "'for' in _src", hint: "range(11) llega hasta el 10.", sol: "for i in range(11):\n    print(i)" },
+      { t: "code", q: "Con un for, mostrá los números del 10 al 0, de mayor a menor.", start: "", expect: "10\n9\n8\n7\n6\n5\n4\n3\n2\n1\n0", test: "'for' in _src", hint: "range(10, -1, -1) cuenta para atrás.", sol: "for i in range(10, -1, -1):\n    print(i)" }
+    ] },
+  { id: "d10l3", title: "Acumular y anidar",
+    intro: [
+      "Un acumulador es una variable que va sumando en cada vuelta:",
+      { code: "total = 0\nfor n in [4, 5, 6]:\n    total += n\nprint(total)  # 15" },
+      "Un for puede ir adentro de otro. `else` después de un for se ejecuta si el bucle terminó sin break. `pass` no hace nada: sirve para dejar un bloque vacío.",
+      { code: "for i in range(2):\n    for j in range(2):\n        print(i, j)\n\nfor n in [1, 2, 3]:\n    pass" }
+    ],
+    ex: [
+      { t: "out", code: "for i in range(2):\n    for j in range(2):\n        print(i, j)", opts: ["0 0\n0 1\n1 0\n1 1", "0 0\n1 1", "0 1\n1 0"] },
+      { t: "out", code: 'for n in [1, 2, 3]:\n    if n == 5:\n        break\nelse:\n    print("no estaba")', opts: ["no estaba", "No muestra nada", "Error"], why: "No hubo break, así que se ejecuta el else." },
+      { t: "out", code: 'for n in range(3):\n    pass\nprint("listo")', opts: ["listo", "0\n1\n2\nlisto", "Error"] },
+      { t: "out", code: 'c = 0\nfor letra in "banana":\n    if letra == "a":\n        c += 1\nprint(c)', opts: ["3", "2", "6"] },
+      { t: "code", q: "Sumá todos los números del 0 al 100 con un for y mostrá el total.", start: "", expect: "5050", test: "'for' in _src", hint: "total = 0 y en cada vuelta total += i, con range(101).", sol: "total = 0\nfor i in range(101):\n    total += i\nprint(total)" },
+      { t: "code", q: "Sumá por separado los pares y los impares del 0 al 100. Mostrá los dos totales (2550 y 2500).", start: "", test: "'2550' in _out and '2500' in _out and 'for' in _src", hint: "Dos acumuladores. Con if i % 2 == 0 decidís a cuál sumar.", sol: 'pares = 0\nimpares = 0\nfor i in range(101):\n    if i % 2 == 0:\n        pares += i\n    else:\n        impares += i\nprint(f"La suma de los pares es {pares}.")\nprint(f"La suma de los impares es {impares}.")' },
+      { t: "code", q: "Con un for, dibujá este triángulo de 5 líneas: # en la primera, ## en la segunda, hasta ##### en la quinta.", start: "", expect: "#\n##\n###\n####\n#####", test: "'for' in _src", hint: '"#" * i repite el numeral i veces.', sol: 'for i in range(1, 6):\n    print("#" * i)' },
+      { t: "code", q: "Mostrá la tabla del 7, del 0 al 10, con este formato: 7 x 3 = 21", start: "", expect: "7 x 0 = 0\n7 x 1 = 7\n7 x 2 = 14\n7 x 3 = 21\n7 x 4 = 28\n7 x 5 = 35\n7 x 6 = 42\n7 x 7 = 49\n7 x 8 = 56\n7 x 9 = 63\n7 x 10 = 70", test: "'for' in _src", hint: 'print(f"7 x {i} = {7 * i}")', sol: 'for i in range(11):\n    print(f"7 x {i} = {7 * i}")' }
+    ] }
 ] }
 ];
 
 const UPCOMING = [
-  [6, "Tuplas"], [7, "Conjuntos"], [8, "Diccionarios"], [9, "Condicionales"], [10, "Bucles"],
   [11, "Funciones"], [12, "Módulos"], [13, "Listas por comprensión"], [14, "Funciones de orden superior"],
   [15, "Tipos de errores"], [16, "Fechas y horas"], [17, "Manejo de excepciones"], [18, "Expresiones regulares"],
   [19, "Archivos"], [20, "Paquetes con pip"], [21, "Clases y objetos"], [22, "Web scraping"],
@@ -604,6 +828,42 @@ const UPCOMING = [
   [27, "Python con MongoDB"], [28, "APIs"], [29, "Crear una API"], [30, "Cierre"]
 ];
 const BEYOND = ["Automatización: Excel, CSV, archivos y PDFs", "Proyectos propios: bot, scraper, web y gastos", "Repaso inteligente de todo el curso"];
+// Machete: lo que se desbloquea al hacer cada lección. [lo que escribís, qué hace, ejemplo]
+const CHEAT = {
+  d1l1: [["print(x)", "Muestra x en pantalla", 'print("Hola")  # Hola']],
+  d1l2: [["+  -  *  /", "Suma, resta, multiplicación y división (/ da decimales)", "7 / 2  # 3.5"], ["//", "División entera, sin decimales", "7 // 2  # 3"], ["%", "Resto de la división", "7 % 2  # 1"], ["**", "Potencia", "2 ** 3  # 8"]],
+  d1l3: [["# texto", "Comentario: Python lo ignora", "# esto es una nota"], ["Indentación", "4 espacios después de una línea que termina en :", 'if x > 0:\n    print("sí")']],
+  d1l4: [["type(x)", "Tipo de un valor", "type(3.5)  # <class 'float'>"], ["int  float  str  bool", "Entero, decimal, texto, verdadero/falso", '10, 3.14, "Ana", True']],
+  d2l1: [["nombre = valor", "Crea o cambia una variable", 'ciudad = "Rosario"']],
+  d2l2: [["a, b = 1, 2", "Varias variables en una línea", "a, b = b, a  # intercambia"]],
+  d2l3: [["len(x)", "Cantidad de caracteres o elementos", 'len("hola")  # 4'], ["abs(x)", "Valor absoluto", "abs(-7)  # 7"], ["round(x, n)", "Redondea a n decimales", "round(3.567, 2)  # 3.57"], ["min()  max()", "El menor y el mayor", "max(4, 9, 2)  # 9"], ["sum(lista)", "Suma los elementos", "sum([1, 2, 3])  # 6"], ["input(msg)", "Pide un dato. Siempre devuelve texto", 'edad = input("Edad: ")']],
+  d2l4: [["int(x)", "Convierte a entero (corta decimales)", 'int("10")  # 10'], ["float(x)", "Convierte a decimal", 'float("3.5")  # 3.5'], ["str(x)", "Convierte a texto", 'str(25)  # "25"']],
+  d3l1: [["+=  -=  *=  /=", "Actualiza una variable", "x += 1  # x = x + 1"]],
+  d3l2: [["( )", "Cambian el orden de las cuentas", "(2 + 3) * 4  # 20"]],
+  d3l3: [["==  !=", "Igual y distinto", "3 == 3  # True"], ["<  >  <=  >=", "Menor, mayor, menor o igual, mayor o igual", "5 >= 5  # True"], ["in  not in", "Si está adentro", '"on" in "Python"  # True']],
+  d3l4: [["and", "True si las dos son verdaderas", "True and False  # False"], ["or", "True si al menos una es verdadera", "True or False  # True"], ["not", "Invierte", "not True  # False"]],
+  d4l1: [["texto + texto", "Une textos", '"Ho" + "la"  # Hola'], ["texto * n", "Repite el texto", '"ja" * 3  # jajaja']],
+  d4l2: [["\\n  \\t", "Salto de línea y tabulación", 'print("A\\nB")'], ['f"...{x}..."', "Mete variables adentro de un texto", 'f"Tengo {edad} años"']],
+  d4l3: [["t[i]", "Carácter en la posición i (desde 0)", '"Python"[0]  # P'], ["t[-1]", "El último", '"Python"[-1]  # n'], ["t[a:b]", "Recorta de a hasta b (sin b)", '"Python"[0:2]  # Py'], ["t[::-1]", "Invierte", '"hola"[::-1]  # aloh']],
+  d4l4: [[".upper()  .lower()", "Todo en mayúsculas o minúsculas", '"hola".upper()  # HOLA'], [".title()  .capitalize()", "Mayúscula en cada palabra o solo en la primera", '"ana gómez".title()'], [".replace(a, b)", "Reemplaza a por b", '"hola".replace("o", "0")'], [".split(sep)", "Corta el texto en una lista", '"a,b".split(",")  # [\'a\', \'b\']'], [".strip()", "Saca espacios del principio y del final", '"  hola ".strip()'], [".count(x)", "Cuántas veces aparece x", '"banana".count("a")  # 3'], [".find(x)", "Posición de x (-1 si no está)", '"Python".find("th")  # 2'], [".startswith(x)  .endswith(x)", "Si empieza o termina con x", '"Python".startswith("Py")']],
+  d4l5: [[".index(x)", "Posición de x (error si no está)", '"Hola".index("l")  # 2'], [".rfind(x)", "Posición de la última aparición", '"banana".rfind("a")  # 5']],
+  d5l1: [["[a, b, c]", "Crea una lista", 'frutas = ["banana", "mango"]'], ["lista[i]", "Elemento en la posición i", "frutas[0]  # banana"], ["a, *resto = lista", "Desempaqueta", "a, *resto = [1, 2, 3]"]],
+  d5l2: [["lista[a:b]", "Recorta la lista", "[1, 2, 3, 4][1:3]  # [2, 3]"], ["lista[i] = v", "Cambia un elemento", "n[0] = 99"]],
+  d5l3: [[".append(x)", "Agrega al final", 'frutas.append("uva")'], [".insert(i, x)", "Agrega en la posición i", 'frutas.insert(1, "kiwi")'], [".remove(x)", "Saca el elemento x", 'frutas.remove("uva")'], [".pop()  .pop(i)", "Saca el último o el de la posición i, y lo devuelve", "x = frutas.pop()"], ["del lista[i]", "Borra por posición", "del frutas[0]"], [".clear()", "Vacía la lista", "frutas.clear()"]],
+  d5l4: [[".sort()  .sort(reverse=True)", "Ordena la lista (cambia la original)", "n.sort()"], ["sorted(lista)", "Devuelve una lista ordenada nueva", "m = sorted(n)"], [".reverse()", "Da vuelta el orden", "n.reverse()"], [".count(x)  .index(x)", "Cuántas veces está x y en qué posición", "n.count(1)"], ["lista + lista  .extend()", "Une listas", "a.extend(b)"], [".copy()", "Copia la lista", "c = a.copy()"]],
+  d6l1: [["(a, b)", "Crea una tupla (no se puede modificar)", 't = (1, 2, 3)'], ["(x,)", "Tupla de un elemento: lleva coma", 'uno = ("solo",)']],
+  d6l2: [["tupla + tupla", "Une tuplas", "(1, 2) + (3,)"], ["list(t)  tuple(l)", "Convierte entre tupla y lista", "lista = list(t)"]],
+  d7l1: [["{a, b}  set()", "Crea un conjunto (sin repetidos ni orden)", "s = set([1, 1, 2])  # {1, 2}"], [".add(x)  .update(lista)", "Agrega uno o varios", "s.add(3)"], [".remove(x)  .discard(x)", "Saca x (discard no da error si no está)", "s.discard(9)"]],
+  d7l2: [[".union(b)", "Todo lo de los dos", "a.union(b)"], [".intersection(b)", "Lo que está en los dos", "a.intersection(b)"], [".difference(b)", "Lo de a que no está en b", "a.difference(b)"], [".symmetric_difference(b)", "Lo que no comparten", "a.symmetric_difference(b)"], [".issubset(b)  .isdisjoint(b)", "Si está todo adentro de b, o si no comparten nada", "{1}.issubset({1, 2})"]],
+  d8l1: [['{"clave": valor}', "Crea un diccionario", 'p = {"nombre": "Ana"}'], ['d["clave"]', "Lee un valor (KeyError si no existe)", 'p["nombre"]  # Ana'], ['.get("clave", otro)', "Lee sin error: None u otro si no existe", 'p.get("edad", 0)']],
+  d8l2: [['d["clave"] = v', "Agrega o cambia un valor", 'p["edad"] = 31'], ['.pop("clave")  del d["clave"]', "Saca una clave", 'p.pop("edad")'], [".keys()  .values()  .items()", "Claves, valores y pares", "list(p.keys())"]],
+  d9l1: [["if cond:  else:", "Ejecuta un bloque según la condición", 'if edad >= 18:\n    print("Mayor")\nelse:\n    print("Menor")']],
+  d9l2: [["elif cond:", "Otro caso más. Se ejecuta solo el primero que se cumple", 'elif nota >= 70:\n    print("B")'], ["A if cond else B", "if en una línea", 'print("par") if n % 2 == 0 else print("impar")']],
+  d9l3: [["if adentro de if", "La indentación dice a qué if pertenece cada else", "if a > 0:\n    if a % 2 == 0:\n        ..."]],
+  d10l1: [["while cond:", "Repite mientras la condición sea verdadera", "while n < 5:\n    n += 1"], ["break", "Corta el bucle", "if n == 3:\n    break"], ["continue", "Pasa a la vuelta siguiente", "if n == 2:\n    continue"]],
+  d10l2: [["for x in algo:", "Recorre cada elemento", "for letra in \"hola\":\n    print(letra)"], ["range(fin)  range(ini, fin, paso)", "Genera números (sin incluir fin)", "range(0, 10, 2)  # 0 2 4 6 8"], ["for k, v in d.items():", "Recorre un diccionario", "for clave, valor in p.items():"]],
+  d10l3: [["total += x", "Acumulador: suma en cada vuelta", "total = 0\nfor n in nums:\n    total += n"], ["for ... else:", "El else corre si no hubo break", "for n in nums:\n    ...\nelse:\n    print(\"sin break\")"], ["pass", "No hace nada; deja un bloque vacío", "for i in range(3):\n    pass"]]
+};
 
 </script>
 <script>
@@ -624,6 +884,7 @@ const I = {
   x: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   ok: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
   play: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 4.5v15l13-7.5-13-7.5Z"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8.5 8h7M8.5 11.5h5"/></svg>',
   review: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg>',
   logo: '<svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="var(--blue)"/><path d="M6 20c3-6 6-6 8.5-2s5.5 4 8-1.5" stroke="var(--sun)" stroke-width="3.4" stroke-linecap="round"/><circle cx="24" cy="13" r="2" fill="#fff"/></svg>'
 };
@@ -719,23 +980,28 @@ function el(html) { const t = document.createElement("template"); t.innerHTML = 
 // ---------- Python (Brython) ----------
 const RUNNER = [
   "from browser import window",
-  "def run_user(src, test, inputs):",
+  "def run_user(src, test, inputs, orig):",
   "    parts = []",
   "    def _print(*args, sep=' ', end='\\n', file=None, flush=False):",
+  "        if len(parts) > 5000: raise RuntimeError('LIMITE_SALIDA')",
   "        parts.append(sep.join(str(a) for a in args) + end)",
+  "    vueltas = [0]",
+  "    def _g():",
+  "        vueltas[0] += 1",
+  "        if vueltas[0] > 100000: raise RuntimeError('LIMITE_BUCLE')",
   "    feed = list(inputs)",
   "    def _input(msg=''):",
   "        v = feed.pop(0) if feed else ''",
   "        parts.append(str(msg) + v + '\\n')",
   "        return v",
-  "    ns = {'__name__': '__main__', 'print': _print, 'input': _input}",
+  "    ns = {'__name__': '__main__', 'print': _print, 'input': _input, '_g': _g}",
   "    err = ''",
   "    ok = -1",
   "    try:",
   "        exec(src, ns)",
   "        if test:",
   "            ns['_out'] = ''.join(parts)",
-  "            ns['_src'] = src",
+  "            ns['_src'] = orig",
   "            ok = 1 if eval(test, ns) else 0",
   "    except BaseException as e:",
   "        err = type(e).__name__ + ': ' + str(e)",
@@ -766,10 +1032,23 @@ function loadPython() {
   return pyPromise;
 }
 function cleanSrc(s) { return s.replace(/[“”„«»]/g, '"').replace(/[‘’‚]/g, "'").replace(/ /g, " ").replace(/\t/g, "    "); }
+// Agrega un control en cada while/for para cortar bucles infinitos sin congelar la app.
+function instrument(src) {
+  const lines = src.split("\n"), out = [];
+  for (let i = 0; i < lines.length; i++) {
+    out.push(lines[i]);
+    const m = lines[i].match(/^(\s*)(while|for)\b.*:\s*(#.*)?$/);
+    if (!m) continue;
+    let j = i + 1;
+    while (j < lines.length && /^\s*(#.*)?$/.test(lines[j])) j++;
+    if (j < lines.length) { const ind = lines[j].match(/^\s*/)[0]; if (ind.length > m[1].length) out.push(ind + "_g()"); }
+  }
+  return out.join("\n");
+}
 async function runPython(src, test, inputs) {
   await loadPython();
   pyResult = null;
-  window.pyRun(src, test || "", inputs || []);
+  window.pyRun(instrument(src), test || "", inputs || [], src);
   return pyResult || { out: "", err: "Error: no se pudo ejecutar", ok: -1 };
 }
 const ERR_TIPS = {
@@ -795,6 +1074,7 @@ function topBar() {
     <span class="stat streak ${st ? "" : "off"}" title="Racha de días">${I.flame}${st}</span>
     <span class="stat xp" title="Puntos de experiencia">${I.bolt}${S.xp}</span>
     <span class="stat hearts ${h ? "" : "off"}" title="Vidas">${I.heart}${h}</span>
+    ${cheatButton()}
   </div></header>`;
 }
 function renderSync() {
@@ -830,7 +1110,7 @@ function renderHome() {
     });
     html += "</div></section>";
   });
-  html += `<section class="soon"><h2>Próximamente: días 6 a 30</h2>
+  html += `<section class="soon"><h2>Próximamente: días 11 a 30</h2>
     <p>Se agregan por tandas. Los días 20, 23, 26, 27 y 29 llevan teoría y desafíos para hacer en la computadora.</p>
     <ol>${UPCOMING.map(([n, t]) => `<li><b>${n}</b><span>${esc(t)}</span></li>`).join("")}</ol></section>`;
   html += `<section class="soon"><h2>Después del día 30</h2><ol>${BEYOND.map((t, i) => `<li><b>+${i + 1}</b><span>${esc(t)}</span></li>`).join("")}</ol></section>`;
@@ -927,6 +1207,7 @@ function lessonShell(inner, foot) {
       <button class="icon-btn" id="quit" aria-label="Salir de la lección">${I.close}</button>
       <div class="l-bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
       ${lesson && lesson.review ? "" : `<span class="stat hearts ${h ? "" : "off"}">${I.heart}${h}</span>`}
+      ${cheatButton()}
     </div>
     <div class="l-body" id="lbody"><div class="wrap">${inner}</div></div>
     <div class="l-foot" id="lfoot"><div class="wrap">${foot}</div></div>
@@ -1050,9 +1331,12 @@ async function runAndShow(item, checking) {
     return null;
   }
   stat.textContent = "";
-  let html = esc(r.out);
+  const outLines = r.out.split("\n");
+  let html = outLines.length > 200 ? esc(outLines.slice(0, 200).join("\n")) + "\n… (" + (outLines.length - 200) + " líneas más)" : esc(r.out);
   if (r.err) {
     const name = r.err.split(":")[0];
+    if (r.err.includes("LIMITE_BUCLE")) r.err = "El bucle dio más de 100.000 vueltas y lo corté. Revisá que la condición del while llegue a ser falsa (por ejemplo, que la variable cambie en cada vuelta).";
+    else if (r.err.includes("LIMITE_SALIDA")) r.err = "El programa mostró más de 5.000 líneas y lo corté. Puede que un bucle no esté terminando.";
     html += (html ? "\n" : "") + '<span class="err">' + esc(r.err) + "</span>";
     outp.innerHTML = html;
     const c = $("#console"); c.querySelectorAll(".tip").forEach(t => t.remove());
@@ -1186,10 +1470,69 @@ document.addEventListener("keydown", ev => {
 });
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && !lesson && remote.ref) remote.ref.get().then(s => { if (s.exists && adopt(s.data())) renderHome(); }).catch(() => {}); });
 
+// ---------- Machete ----------
+function cheatUnlocked() {
+  const ids = new Set(Object.keys(S.done));
+  if (lesson && lesson.l && lesson.l.id) ids.add(lesson.l.id);
+  const groups = [];
+  COURSE.forEach(d => {
+    const items = [];
+    d.lessons.forEach(l => { if (ids.has(l.id) && CHEAT[l.id]) CHEAT[l.id].forEach(c => items.push(c)); });
+    if (items.length) groups.push({ day: d.day, title: d.title, items });
+  });
+  return groups;
+}
+function cheatButton() {
+  const n = cheatUnlocked().reduce((a, g) => a + g.items.length, 0);
+  return `<button class="cheat-btn" id="cheatBtn" aria-label="Abrir machete" aria-expanded="false" title="Machete">${I.book}<span>${n}</span></button>`;
+}
+function wireCheat() {
+  const b = $("#cheatBtn"); if (!b) return;
+  b.onclick = (ev) => { ev.stopPropagation(); const open = $("#cheat"); if (open) closeCheat(); else openCheat(); };
+}
+function closeCheat() { const p = $("#cheat"); if (p) p.remove(); const b = $("#cheatBtn"); if (b) b.setAttribute("aria-expanded", "false"); }
+function openCheat() {
+  const groups = cheatUnlocked(), total = groups.reduce((a, g) => a + g.items.length, 0);
+  const panel = el(`<div class="cheat" id="cheat" role="dialog" aria-label="Machete">
+    <div class="cheat-head"><div><h2>Machete</h2><p>${total} ${total === 1 ? "cosa descubierta" : "cosas descubiertas"}</p></div>
+      <button class="icon-btn" id="cheatClose" aria-label="Cerrar machete">${I.close}</button></div>
+    <input class="cheat-search" id="cheatQ" type="search" placeholder="Buscar: split, range, diccionario…" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div class="cheat-list" id="cheatList"></div>
+  </div>`);
+  document.body.appendChild(panel);
+  $("#cheatBtn").setAttribute("aria-expanded", "true");
+  const draw = (q) => {
+    q = (q || "").trim().toLowerCase();
+    let html = "";
+    groups.slice().reverse().forEach(g => {
+      const items = g.items.filter(c => !q || (c[0] + " " + c[1] + " " + c[2]).toLowerCase().includes(q));
+      if (!items.length) return;
+      html += `<details ${q || g === groups[groups.length - 1] ? "open" : ""}><summary>Día ${g.day} · ${esc(g.title)}<span>${items.length}</span></summary>` +
+        items.map(c => `<div class="cheat-item"><code>${esc(c[0])}</code><p>${esc(c[1])}</p><pre>${hl(c[2])}</pre></div>`).join("") + "</details>";
+    });
+    $("#cheatList").innerHTML = html || `<p class="cheat-empty">${total ? "No encontré nada con esa búsqueda." : "Todavía no descubriste nada. Completá tu primera lección y acá aparecen las funciones que aprendas."}</p>`;
+  };
+  draw("");
+  $("#cheatQ").oninput = (e) => draw(e.target.value);
+  $("#cheatClose").onclick = closeCheat;
+}
+document.addEventListener("click", e => { if ($("#cheat") && !e.target.closest("#cheat") && !e.target.closest("#cheatBtn")) closeCheat(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeCheat(); });
+new MutationObserver(() => { if ($("#cheatBtn") && !$("#cheatBtn").onclick) wireCheat(); }).observe(app, { childList: true });
+
 renderHome();
 initRemote();
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
-  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+  const hadController = !!navigator.serviceWorker.controller;
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => r.update()).catch(() => {}); });
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadController) return;
+    if (!lesson) { location.reload(); return; }
+    if ($("#updToast")) return;
+    const t = el('<button class="upd-toast" id="updToast">Hay contenido nuevo. Tocá para actualizar al terminar la lección.</button>');
+    t.onclick = () => location.reload();
+    document.body.appendChild(t);
+  });
 }
 })();
 
