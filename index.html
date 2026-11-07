@@ -155,6 +155,15 @@ main.home { padding-block: 18px 48px; display: flex; flex-direction: column; gap
 .upd-info, .upd-msg { margin: 0; font-size: 13px; color: var(--muted); }
 .upd-info b { color: var(--ink); font-weight: 700; }
 .update .btn { max-width: 320px; }
+.freeze-row { grid-column: 1 / -1; display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: var(--muted); }
+.freeze-row svg, .notice svg, .earned svg { flex: none; color: var(--blue); }
+.freeze-row b { color: var(--ink); }
+.notice { display: flex; gap: 10px; align-items: flex-start; background: var(--blue-soft); border-radius: 16px; padding: 12px 14px; }
+.notice p { margin: 0; font-size: 15px; }
+.gift { display: flex; gap: 14px; align-items: flex-start; background: var(--sun-soft); border: 2px solid var(--sun); border-radius: 18px; padding: 16px; }
+.gift > div:first-child { color: var(--sun-deep); } .gift > div:first-child svg { width: 40px; height: 40px; }
+.gift h2 { font-size: 19px; } .gift p { margin: 4px 0 10px; font-size: 15px; }
+.earned { color: var(--blue) !important; font-weight: 700; display: flex; gap: 6px; align-items: center; }
 .sync { text-align: center; color: var(--muted); font-size: 13px; }
 .sync .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--lock-ink); margin-right: 6px; vertical-align: middle; }
 .sync.on .dot { background: var(--ok); }
@@ -888,6 +897,7 @@ const I = {
   x: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   ok: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
   play: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 4.5v15l13-7.5-13-7.5Z"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"/></svg>',
   book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8.5 8h7M8.5 11.5h5"/></svg>',
   review: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg>',
   logo: '<svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="var(--blue)"/><path d="M6 20c3-6 6-6 8.5-2s5.5 4 8-1.5" stroke="var(--sun)" stroke-width="3.4" stroke-linecap="round"/><circle cx="24" cy="13" r="2" fill="#fff"/></svg>'
@@ -902,7 +912,7 @@ LESSONS.forEach(l => l.ex.forEach((e, i) => { EX_BY_ID[l.id + "-" + i] = e; }));
 // ---------- Estado ----------
 function today(d = new Date()) { const p = n => String(n).padStart(2, "0"); return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()); }
 function yesterday() { const d = new Date(); d.setDate(d.getDate() - 1); return today(d); }
-function fresh() { return { v: 1, xp: 0, done: {}, streak: { n: 0, last: null }, hearts: { n: MAX_HEARTS, ts: 0 }, mistakes: [], day: { date: null, count: 0 }, updatedAt: 0 }; }
+function fresh() { return { v: 1, xp: 0, done: {}, streak: { n: 0, last: null }, hearts: { n: MAX_HEARTS, ts: 0 }, mistakes: [], day: { date: null, count: 0 }, freezes: 0, freezeNote: null, gifts: {}, updatedAt: 0 }; }
 let S = fresh();
 try { const raw = localStorage.getItem(LS_KEY); if (raw) S = Object.assign(fresh(), JSON.parse(raw)); } catch (e) {}
 
@@ -953,6 +963,29 @@ function loseHeart() {
 }
 function gainHeart() { const cur = heartsNow(); S.hearts = { n: Math.min(MAX_HEARTS, cur + 1), ts: cur + 1 >= MAX_HEARTS ? 0 : Date.now() }; }
 function nextHeartIn() { const h = S.hearts; const ms = REGEN_MS - ((Date.now() - h.ts) % REGEN_MS); return Math.ceil(ms / 60000); }
+// ---------- Protectores de racha ----------
+// Se gana 1 cada 7 días seguidos de racha (máximo 2 guardados). Si un día no hacés lección, se usa uno solo.
+const FREEZE_EVERY = 7, FREEZE_MAX = 2;
+function dayNum(str) { const [y, m, d] = str.split("-").map(Number); return Math.round(new Date(y, m - 1, d).getTime() / 86400000); }
+function applyFreezes() {
+  const s = S.streak; if (!s.last || !s.n) return;
+  const missed = dayNum(today()) - dayNum(s.last) - 1;
+  if (missed <= 0 || missed > (S.freezes || 0)) return;
+  S.freezes -= missed;
+  S.streak = { n: s.n, last: yesterday() };
+  S.freezeNote = { date: today(), used: missed };
+  save();
+}
+const GIFT_ID = "racha-2026-11-07", GIFT_STREAK = 10, GIFT_UNTIL = "2026-11-21";
+function giftAvailable() { return !(S.gifts || {})[GIFT_ID] && today() <= GIFT_UNTIL && streakNow() < GIFT_STREAK; }
+function claimGift() {
+  const t = today();
+  if (S.streak.last === t && S.streak.n < GIFT_STREAK) S.streak = { n: GIFT_STREAK + S.streak.n, last: t };
+  else S.streak = { n: GIFT_STREAK, last: yesterday() };
+  S.freezes = Math.min(FREEZE_MAX, (S.freezes || 0) + 1);
+  S.gifts = Object.assign({}, S.gifts, { [GIFT_ID]: Date.now() });
+  save(); renderHome(); window.scrollTo(0, 0);
+}
 function streakNow() { const s = S.streak; return (s.last === today() || s.last === yesterday()) ? s.n : 0; }
 function todayCount() { return S.day.date === today() ? S.day.count : 0; }
 function firstUndone() { const i = LESSONS.findIndex(l => !S.done[l.id]); return i === -1 ? LESSONS.length : i; }
@@ -1097,7 +1130,11 @@ function renderHome() {
     ${next ? `<button class="btn ${tc >= 1 ? "ghost" : ""}" data-start="${next.id}">${I.play}${tc >= 1 ? "Otra" : "Empezar"}</button>` : ""}
     <div class="bar"><i style="width:${Math.min(100, tc * 100)}%"></i></div>
     ${mist ? `<button class="btn ghost wide small" id="reviewBtn" style="grid-column:1/-1">Repasar errores (${mist})</button>` : ""}
+    <div class="freeze-row">${I.shield}<span>Protectores de racha: <b>${S.freezes || 0} de ${FREEZE_MAX}</b>. ${(S.freezes || 0) >= FREEZE_MAX ? "Tenés el máximo." : "Ganás uno cada " + FREEZE_EVERY + " días seguidos" + (streakNow() ? " (te faltan " + (FREEZE_EVERY - (streakNow() % FREEZE_EVERY)) + ")" : "") + "."}</span></div>
   </section>`;
+  if (S.freezeNote && S.freezeNote.date === today()) html += `<section class="notice">${I.shield}<p>Ayer no hiciste lección y se ${S.freezeNote.used === 1 ? "usó un protector" : "usaron " + S.freezeNote.used + " protectores"}. Tu racha de ${streakNow()} días sigue viva. Hacé una lección hoy para sumar.</p></section>`;
+  if (giftAvailable()) html += `<section class="gift"><div>${I.flame}</div><div><h2>Regalo: recuperá tu racha</h2><p>Perdiste tu racha de ${GIFT_STREAK} días. Tocá para recuperarla y sumar un protector para la próxima.</p>
+    <button class="btn sun small" id="giftBtn">Recuperar mi racha de ${GIFT_STREAK} días</button></div></section>`;
   COURSE.forEach(d => {
     const done = d.lessons.filter(l => S.done[l.id]).length;
     html += `<section class="unit ${done === d.lessons.length ? "done" : ""}">
@@ -1132,6 +1169,7 @@ function renderHome() {
   app.querySelectorAll("[data-node]").forEach(b => b.onclick = (ev) => { ev.stopPropagation(); togglePop(b); });
   $("#expBtn").onclick = exportProgress;
   $("#updBtn").onclick = checkUpdate;
+  const gb = $("#giftBtn"); if (gb) gb.onclick = claimGift;
   $("#impBtn").onclick = importForm;
 }
 function encodeProgress() { return "SERP1." + btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
@@ -1164,6 +1202,8 @@ function mergeProgress(d) {
   const o = Object.assign(fresh(), d);
   Object.entries(o.done || {}).forEach(([k, v]) => { const c = S.done[k]; if (!c || (v.best || 0) > (c.best || 0)) S.done[k] = v; });
   S.xp = Math.max(S.xp || 0, o.xp || 0);
+  S.freezes = Math.max(S.freezes || 0, o.freezes || 0);
+  S.gifts = Object.assign({}, o.gifts || {}, S.gifts || {});
   if ((o.streak.last || "") > (S.streak.last || "") || (o.streak.last === S.streak.last && o.streak.n > S.streak.n)) S.streak = o.streak;
   if (o.day.date === S.day.date) S.day.count = Math.max(S.day.count, o.day.count); else if ((o.day.date || "") > (S.day.date || "")) S.day = o.day;
   S.mistakes = Array.from(new Set(S.mistakes.concat(o.mistakes || []))).filter(id => EX_BY_ID[id]);
@@ -1433,7 +1473,12 @@ function finishLesson() {
     S.done[L.l.id] = { at: Date.now(), best: Math.max(prev ? prev.best : 0, Math.round(100 * (L.total - L.missed.size) / L.total)) };
   }
   S.xp += xp;
-  if (S.streak.last !== t) { S.streak = { n: S.streak.last === yesterday() ? S.streak.n + 1 : 1, last: t }; }
+  applyFreezes();
+  let earned = false;
+  if (S.streak.last !== t) {
+    S.streak = { n: S.streak.last === yesterday() ? S.streak.n + 1 : 1, last: t };
+    if (S.streak.n % FREEZE_EVERY === 0 && (S.freezes || 0) < FREEZE_MAX) { S.freezes = (S.freezes || 0) + 1; earned = true; }
+  }
   S.day = { date: t, count: todayCount() + 1 };
   save();
   const acc = Math.round(100 * (L.total - L.missed.size) / L.total);
@@ -1442,6 +1487,7 @@ function finishLesson() {
     <div class="big-icon" style="color:var(--sun)">${I.star}</div>
     <h1>${L.review ? "Repaso terminado" : perfect ? "¡Lección perfecta!" : "¡Lección completa!"}</h1>
     <p>${L.review ? "Recuperaste una vida." : esc(L.l.title)}</p>
+    ${earned ? `<p class="earned">${I.shield} ${S.streak.n} días seguidos: ganaste un protector de racha.</p>` : ""}
     <div class="tiles">
       <div class="tile" style="--c:var(--sun-deep)"><div class="h">XP</div><div class="n">+${xp}</div></div>
       <div class="tile" style="--c:var(--ok)"><div class="h">Precisión</div><div class="n">${acc}%</div></div>
@@ -1478,7 +1524,7 @@ document.addEventListener("keydown", ev => {
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && !lesson && remote.ref) remote.ref.get().then(s => { if (s.exists && adopt(s.data())) renderHome(); }).catch(() => {}); });
 
 // ---------- Actualización ----------
-const APP_BUILD = "2026-10-30T15:02";
+const APP_BUILD = "2026-11-07T00:08";
 const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 function buildLabel(b) {
   const m = String(b).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
@@ -1549,6 +1595,7 @@ document.addEventListener("click", e => { if ($("#cheat") && !e.target.closest("
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeCheat(); });
 new MutationObserver(() => { if ($("#cheatBtn") && !$("#cheatBtn").onclick) wireCheat(); }).observe(app, { childList: true });
 
+applyFreezes();
 renderHome();
 initRemote();
 if ("serviceWorker" in navigator && location.protocol !== "file:") {

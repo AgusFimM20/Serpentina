@@ -1,6 +1,6 @@
 // Guarda todos los archivos de la app para que funcione sin internet.
 // Al publicar una versión nueva, cambiá VERSION para que los dispositivos la descarguen.
-const VERSION = "serpentina-2026-10-30T1502";
+const VERSION = "serpentina-2026-11-07T0008";
 const FILES = [
   "./", "index.html", "manifest.webmanifest", "brython.min.js",
   "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "icons/apple-touch-icon.png",
