@@ -830,12 +830,200 @@ print("Ella dijo \"hola\"")  # \": comillas adentro del texto` },
       { t: "code", q: "Con un for, dibujá este triángulo de 5 líneas: # en la primera, ## en la segunda, hasta ##### en la quinta.", start: "", expect: "#\n##\n###\n####\n#####", test: "'for' in _src", hint: '"#" * i repite el numeral i veces.', sol: 'for i in range(1, 6):\n    print("#" * i)' },
       { t: "code", q: "Mostrá la tabla del 7, del 0 al 10, con este formato: 7 x 3 = 21", start: "", expect: "7 x 0 = 0\n7 x 1 = 7\n7 x 2 = 14\n7 x 3 = 21\n7 x 4 = 28\n7 x 5 = 35\n7 x 6 = 42\n7 x 7 = 49\n7 x 8 = 56\n7 x 9 = 63\n7 x 10 = 70", test: "'for' in _src", hint: 'print(f"7 x {i} = {7 * i}")', sol: 'for i in range(11):\n    print(f"7 x {i} = {7 * i}")' }
     ] }
+] },
+{ day: 11, title: "Funciones", lessons: [
+  { id: "d11l1", title: "Definir y llamar",
+    intro: [
+      "Una función es un bloque de código con nombre que podés usar muchas veces. Se crea con `def` y se ejecuta al llamarla por su nombre con paréntesis.",
+      { code: 'def saludar():\n    print("Hola")\n\nsaludar()   # Hola\nsaludar()   # Hola' },
+      "Los parámetros son los datos que recibe. `return` devuelve un resultado y termina la función. Sin return, la función devuelve `None`.",
+      { code: "def sumar(a, b):\n    return a + b\n\ntotal = sumar(2, 3)\nprint(total)  # 5" }
+    ],
+    ex: [
+      { t: "out", code: 'def saludar():\n    print("Hola")\nsaludar()\nsaludar()', opts: ["Hola\nHola", "Hola", "No muestra nada"] },
+      { t: "out", code: 'def saludar():\n    print("Hola")', opts: ["No muestra nada", "Hola", "Error"], why: "Definir una función no la ejecuta. Hay que llamarla: saludar()." },
+      { t: "out", code: "def doble(n):\n    return n * 2\nprint(doble(4))", opts: ["8", "4", "n * 2"] },
+      { t: "out", code: "def sumar(a, b):\n    return a + b\nprint(sumar(2, 3) + 1)", opts: ["6", "5", "Error"], why: "sumar(2, 3) devuelve 5, y después se le suma 1." },
+      { t: "out", code: 'def f():\n    print("A")\nx = f()\nprint(x)', opts: ["A\nNone", "None", "A"], why: "f muestra A pero no tiene return, así que devuelve None." },
+      { t: "out", code: 'def f(n):\n    return n\n    print("chau")\nprint(f(1))', opts: ["1", "1\nchau", "chau"], why: "return termina la función: lo que está abajo no se ejecuta." },
+      { t: "mc", q: "¿Qué palabra crea una función?", opts: ["def", "function", "func"], mono: true },
+      { t: "fill", q: "Completá la función que multiplica dos números.", code: "def ___(a, b):\n    ___ a * b\nprint(multiplicar(3, 4))", bank: ["multiplicar", "return", "print", "def"], a: ["multiplicar", "return"] },
+      { t: "code", q: "Definí area_rectangulo(base, altura) que devuelva base * altura. Mostrá area_rectangulo(5, 3).", start: "", test: "area_rectangulo(2, 4) == 8 and '15' in _out", hint: "def area_rectangulo(base, altura):\n    return base * altura", sol: "def area_rectangulo(base, altura):\n    return base * altura\n\nprint(area_rectangulo(5, 3))" }
+    ] },
+  { id: "d11l2", title: "Parámetros",
+    intro: [
+      "Un parámetro puede tener un valor por defecto, que se usa si no le pasás nada. También podés pasar los argumentos por nombre, en cualquier orden.",
+      { code: 'def saludar(nombre="amigo"):\n    print(f"Hola, {nombre}")\n\nsaludar()        # Hola, amigo\nsaludar("Ana")   # Hola, Ana\n\ndef resta(a, b):\n    return a - b\nprint(resta(b=2, a=10))  # 8' },
+      "Con `*args` la función acepta cualquier cantidad de argumentos, que llegan como tupla.",
+      { code: "def sumar_todos(*nums):\n    return sum(nums)\nprint(sumar_todos(1, 2, 3))  # 6" }
+    ],
+    ex: [
+      { t: "out", code: 'def saludar(nombre="amigo"):\n    print(f"Hola, {nombre}")\nsaludar()', opts: ["Hola, amigo", "Hola, nombre", "Error"] },
+      { t: "out", code: 'def saludar(nombre="amigo"):\n    print(f"Hola, {nombre}")\nsaludar("Ana")', opts: ["Hola, Ana", "Hola, amigo", "Hola, nombre"] },
+      { t: "out", code: "def resta(a, b):\n    return a - b\nprint(resta(b=2, a=10))", opts: ["8", "-8", "Error"], why: "Pasados por nombre, a vale 10 y b vale 2, sin importar el orden." },
+      { t: "out", code: "def total(*nums):\n    return sum(nums)\nprint(total(1, 2, 3))", opts: ["6", "(1, 2, 3)", "Error"] },
+      { t: "out", code: "def info(*args):\n    print(type(args))\ninfo(1, 2)", opts: ["<class 'tuple'>", "<class 'list'>", "<class 'int'>"] },
+      { t: "out", code: "def f(a, b):\n    return a + b\nprint(f(1))", opts: ["TypeError (falta un argumento)", "1", "None"], err: "TypeError" },
+      { t: "mc", q: "¿Para qué sirve *args?", opts: ["Para recibir cualquier cantidad de argumentos", "Para multiplicar los argumentos", "Para hacer obligatorio un argumento"] },
+      { t: "code", q: "Definí potencia(base, exp=2) que devuelva base ** exp. Mostrá potencia(3) y potencia(2, 5).", start: "", test: "potencia(4) == 16 and potencia(2, 3) == 8 and '9' in _out and '32' in _out", hint: "def potencia(base, exp=2):", sol: "def potencia(base, exp=2):\n    return base ** exp\n\nprint(potencia(3))\nprint(potencia(2, 5))" },
+      { t: "code", q: "Definí suma_todos(*nums) que devuelva la suma de todos. Mostrá suma_todos(1, 2, 3, 4).", start: "", test: "suma_todos(5, 5) == 10 and _out.strip() == '10'", hint: "return sum(nums)", sol: "def suma_todos(*nums):\n    return sum(nums)\n\nprint(suma_todos(1, 2, 3, 4))" }
+    ] },
+  { id: "d11l3", title: "Práctica de funciones",
+    intro: [
+      "Ejercicios del día 11 del curso original. Cada uno es una función chica que devuelve algo con return.",
+      { code: "def es_positivo(n):\n    return n > 0\n\nprint(es_positivo(5))  # True" }
+    ],
+    ex: [
+      { t: "code", q: "Definí es_par(n) que devuelva True si n es par. Mostrá es_par(10) y es_par(7).", start: "", expect: "True\nFalse", test: "es_par(4) is True and es_par(3) is False", hint: "return n % 2 == 0", sol: "def es_par(n):\n    return n % 2 == 0\n\nprint(es_par(10))\nprint(es_par(7))" },
+      { t: "code", q: "Definí celsius_a_fahrenheit(c) que devuelva c * 9 / 5 + 32. Mostrá el resultado para 100.", start: "", test: "celsius_a_fahrenheit(0) == 32 and _out.strip() in ('212.0', '212')", hint: "return c * 9 / 5 + 32", sol: "def celsius_a_fahrenheit(c):\n    return c * 9 / 5 + 32\n\nprint(celsius_a_fahrenheit(100))" },
+      { t: "code", q: "Definí invertir_lista(lista) que devuelva la lista al revés. Mostrá invertir_lista([1, 2, 3, 4]).", start: "", expect: "[4, 3, 2, 1]", test: "invertir_lista(['a', 'b']) == ['b', 'a']", hint: "return lista[::-1]", sol: "def invertir_lista(lista):\n    return lista[::-1]\n\nprint(invertir_lista([1, 2, 3, 4]))" },
+      { t: "code", q: 'Definí mayusculas(lista) que devuelva una lista nueva con cada texto en mayúsculas. Mostrá mayusculas(["ana", "luis"]).', start: "", expect: "['ANA', 'LUIS']", test: "mayusculas(['a', 'bc']) == ['A', 'BC']", hint: "Armá una lista vacía y en un for agregá texto.upper().", sol: 'def mayusculas(lista):\n    nueva = []\n    for texto in lista:\n        nueva.append(texto.upper())\n    return nueva\n\nprint(mayusculas(["ana", "luis"]))' },
+      { t: "code", q: "Definí calcular_imc(peso, altura) que devuelva peso / altura ** 2 redondeado a 1 decimal. Mostrá calcular_imc(75, 1.80).", start: "", expect: "23.1", test: "calcular_imc(80, 2) == 20.0", hint: "return round(peso / altura ** 2, 1)", sol: "def calcular_imc(peso, altura):\n    return round(peso / altura ** 2, 1)\n\nprint(calcular_imc(75, 1.80))" },
+      { t: "out", code: "def f(lista):\n    lista.append(9)\nn = [1]\nf(n)\nprint(n)", opts: ["[1, 9]", "[1]", "None"], why: "La función recibe la misma lista, así que append cambia la original." }
+    ] }
+] },
+{ day: 12, title: "Módulos", lessons: [
+  { id: "d12l1", title: "Importar módulos",
+    intro: [
+      "Un módulo es un archivo .py con código listo para usar. Python trae muchos. Se usan con `import`.",
+      { code: "import math\nprint(math.sqrt(16))  # 4.0\nprint(math.pi)        # 3.141592653589793\n\nfrom math import sqrt, pi   # traer solo algunas cosas\nprint(sqrt(9))               # 3.0\n\nfrom math import sqrt as raiz  # con otro nombre\nprint(raiz(25))                # 5.0" },
+      "Si en tu computadora creás un archivo `mimodulo.py` con funciones, desde otro archivo de la misma carpeta lo usás con `import mimodulo`. En la app no hay archivos, así que practicamos con los módulos de Python."
+    ],
+    ex: [
+      { t: "out", code: "import math\nprint(math.sqrt(16))", opts: ["4.0", "4", "16"] },
+      { t: "out", code: "import math\nprint(math.floor(3.7), math.ceil(3.2))", opts: ["3 4", "4 3", "3.7 3.2"], why: "floor redondea para abajo y ceil para arriba." },
+      { t: "out", code: "from math import pi\nprint(round(pi, 2))", opts: ["3.14", "3.1", "pi"] },
+      { t: "out", code: "from math import sqrt as raiz\nprint(raiz(81))", opts: ["9.0", "81", "Error"] },
+      { t: "out", code: "import math\nprint(sqrt(4))", opts: ["NameError (sqrt no está definido)", "2.0", "4"], err: "NameError", why: "Con import math hay que escribir math.sqrt." },
+      { t: "mc", q: "¿Qué es un módulo?", opts: ["Un archivo .py con código que podés importar", "Un tipo de dato", "Una función que se repite"] },
+      { t: "fill", q: "Completá para traer solo sqrt.", code: "___ math ___ sqrt\nprint(sqrt(25))", bank: ["from", "import", "def", "as"], a: ["from", "import"] },
+      { t: "code", q: "Importá math y mostrá el área de un círculo de radio 3 (math.pi * radio ** 2), redondeada a 2 decimales.", start: "", expect: "28.27", test: "'math' in _src", hint: "print(round(math.pi * 3 ** 2, 2))", sol: "import math\n\nradio = 3\nprint(round(math.pi * radio ** 2, 2))" }
+    ] },
+  { id: "d12l2", title: "random, statistics y string",
+    intro: [
+      "`random` elige al azar, `statistics` calcula promedios y `string` trae listas de caracteres.",
+      { code: 'import random\nrandom.randint(1, 6)       # un entero del 1 al 6, incluidos\nrandom.choice(["a", "b"])  # un elemento al azar\nrandom.random()            # un decimal entre 0 y 1\n\nimport statistics\nstatistics.mean([2, 4, 6])    # 4: promedio\nstatistics.median([3, 1, 2])  # 2: el del medio\nstatistics.mode([1, 2, 2])    # 2: el que más se repite\n\nimport string\nstring.ascii_letters  # abc...XYZ\nstring.digits         # 0123456789' }
+    ],
+    ex: [
+      { t: "mc", q: "¿Qué puede mostrar print(random.randint(1, 3))?", opts: ["1, 2 o 3", "Solo 1 o 2", "Cualquier número"], why: "randint incluye los dos extremos." },
+      { t: "mc", q: "¿Qué hace random.choice(lista)?", opts: ["Elige un elemento al azar de la lista", "Ordena la lista", "Mezcla la lista"] },
+      { t: "out", code: "import statistics\nprint(statistics.mean([2, 4, 6]))", opts: ["4", "12", "6"] },
+      { t: "out", code: "import statistics\nprint(statistics.median([3, 1, 2]))", opts: ["2", "1", "3"], why: "Ordenada queda [1, 2, 3], y el del medio es 2." },
+      { t: "out", code: "import statistics\nprint(statistics.mode([1, 2, 2, 3]))", opts: ["2", "1", "3"] },
+      { t: "out", code: "import string\nprint(string.digits)", opts: ["0123456789", "123456789", "digits"] },
+      { t: "code", q: "Escribí tirar_dado() que devuelva un número al azar del 1 al 6 con random.randint. Mostrá una tirada.", start: "import random\n", test: "all(1 <= tirar_dado() <= 6 for _ in range(50)) and 'randint' in _src", hint: "return random.randint(1, 6)", sol: "import random\n\ndef tirar_dado():\n    return random.randint(1, 6)\n\nprint(tirar_dado())" },
+      { t: "code", q: "Escribí id_aleatorio() que devuelva un texto de 6 caracteres al azar, elegidos entre string.ascii_letters + string.digits. Mostrá uno.", start: "import random\nimport string\n", test: "len(id_aleatorio()) == 6 and id_aleatorio() != id_aleatorio() and all(c.isalnum() for c in id_aleatorio())", hint: "En un for de 6 vueltas, sumá random.choice(caracteres) a un texto vacío.", sol: 'import random\nimport string\n\ndef id_aleatorio():\n    caracteres = string.ascii_letters + string.digits\n    texto = ""\n    for i in range(6):\n        texto += random.choice(caracteres)\n    return texto\n\nprint(id_aleatorio())' },
+      { t: "code", q: "Con statistics, mostrá la media y después la mediana de las edades (dos líneas).", start: "import statistics\nedades = [31, 26, 34, 37, 27, 26, 32, 32, 26, 27, 27, 24, 32, 33, 27, 25, 26, 38, 37, 31, 34, 24, 33, 29, 26]\n", test: "_out.split() == [str(statistics.mean(edades)), str(statistics.median(edades))]", hint: "print(statistics.mean(edades)) y print(statistics.median(edades))", sol: "import statistics\nedades = [31, 26, 34, 37, 27, 26, 32, 32, 26, 27, 27, 24, 32, 33, 27, 25, 26, 38, 37, 31, 34, 24, 33, 29, 26]\nprint(statistics.mean(edades))\nprint(statistics.median(edades))" }
+    ] }
+] },
+{ day: 13, title: "Comprensiones y lambda", lessons: [
+  { id: "d13l1", title: "Listas por comprensión",
+    intro: [
+      "Una comprensión arma una lista en una sola línea: qué poner, de dónde sacarlo y, si querés, un filtro.",
+      { code: "dobles = [x * 2 for x in range(4)]\nprint(dobles)  # [0, 2, 4, 6]\n\npares = [x for x in range(10) if x % 2 == 0]\nprint(pares)   # [0, 2, 4, 6, 8]" },
+      "Equivale a un for que va haciendo append, escrito más corto. También se pueden anidar:",
+      { code: "matriz = [[1, 2], [3, 4]]\nplana = [x for fila in matriz for x in fila]\nprint(plana)  # [1, 2, 3, 4]" }
+    ],
+    ex: [
+      { t: "out", code: "print([x * 2 for x in range(4)])", opts: ["[0, 2, 4, 6]", "[2, 4, 6, 8]", "[0, 1, 2, 3]"] },
+      { t: "out", code: "print([x for x in range(10) if x % 2 == 0])", opts: ["[0, 2, 4, 6, 8]", "[1, 3, 5, 7, 9]", "[2, 4, 6, 8, 10]"] },
+      { t: "out", code: 'print([c.upper() for c in "abc"])', opts: ["['A', 'B', 'C']", "ABC", "['abc']"] },
+      { t: "out", code: 'print([len(p) for p in ["sol", "luna"]])', opts: ["[3, 4]", "7", "[4, 3]"] },
+      { t: "out", code: "print([n for n in [-2, 0, 3] if n > 0])", opts: ["[3]", "[0, 3]", "[-2]"] },
+      { t: "out", code: "m = [[1, 2], [3, 4]]\nprint([x for fila in m for x in fila])", opts: ["[1, 2, 3, 4]", "[[1, 2], [3, 4]]", "[1, 3]"] },
+      { t: "fill", q: "Completá la comprensión de los cuadrados.", code: "cuadrados = [n ** 2 ___ n ___ range(4)]\nprint(cuadrados)", bank: ["for", "in", "if", "while"], a: ["for", "in"] },
+      { t: "code", q: "Con una comprensión, armá la lista de los números negativos y el cero. Mostrala.", start: "numeros = [-4, -3, -2, -1, 0, 2, 4, 6]\n", expect: "[-4, -3, -2, -1, 0]", test: "'for' in _src and '[' in _src", hint: "[n for n in numeros if n <= 0]", sol: "numeros = [-4, -3, -2, -1, 0, 2, 4, 6]\nprint([n for n in numeros if n <= 0])" },
+      { t: "code", q: "Aplaná la lista en una sola lista de números usando una comprensión.", start: "lista_de_listas = [[[1, 2, 3]], [[4, 5, 6]], [[7, 8, 9]]]\n", expect: "[1, 2, 3, 4, 5, 6, 7, 8, 9]", test: "'for' in _src", hint: "Hay tres niveles: [x for a in lista_de_listas for b in a for x in b]", sol: "lista_de_listas = [[[1, 2, 3]], [[4, 5, 6]], [[7, 8, 9]]]\nprint([x for a in lista_de_listas for b in a for x in b])" },
+      { t: "code", q: "Con una comprensión, armá una lista de tuplas (n, n ** 2, n ** 3) para n del 0 al 3 y mostrala.", start: "", expect: "[(0, 0, 0), (1, 1, 1), (2, 4, 8), (3, 9, 27)]", test: "'for' in _src", hint: "[(n, n ** 2, n ** 3) for n in range(4)]", sol: "print([(n, n ** 2, n ** 3) for n in range(4)])" }
+    ] },
+  { id: "d13l2", title: "Funciones lambda",
+    intro: [
+      "Una lambda es una función corta, de una sola expresión, que se escribe en una línea.",
+      { code: "doble = lambda x: x * 2\nprint(doble(5))     # 10\n\nsuma = lambda a, b: a + b\nprint(suma(2, 3))   # 5" },
+      "Se usan mucho como dato para otra función. Por ejemplo, para ordenar con un criterio:",
+      { code: 'nombres = ["Ana", "Bo", "Carla"]\nprint(sorted(nombres, key=lambda n: len(n)))\n# [\'Bo\', \'Ana\', \'Carla\']' }
+    ],
+    ex: [
+      { t: "out", code: "doble = lambda x: x * 2\nprint(doble(5))", opts: ["10", "5", "x * 2"] },
+      { t: "out", code: "suma = lambda a, b: a + b\nprint(suma(2, 3))", opts: ["5", "23", "Error"] },
+      { t: "out", code: "print((lambda x: x ** 2)(3))", opts: ["9", "6", "3"] },
+      { t: "out", code: 'p = ["ana", "Bo", "carla"]\nprint(sorted(p, key=lambda s: len(s)))', opts: ["['Bo', 'ana', 'carla']", "['ana', 'Bo', 'carla']", "['carla', 'ana', 'Bo']"], why: "Ordena por la cantidad de letras: 2, 3 y 5." },
+      { t: "mc", q: "¿Qué diferencia una lambda de una función con def?", opts: ["Es corta, de una sola expresión", "Puede tener muchas líneas", "Solo funciona con números"] },
+      { t: "code", q: "Escribí una lambda cubo que devuelva x ** 3. Mostrá cubo(4).", start: "", test: "cubo(2) == 8 and _out.strip() == '64' and 'lambda' in _src", hint: "cubo = lambda x: x ** 3", sol: "cubo = lambda x: x ** 3\nprint(cubo(4))" },
+      { t: "code", q: "Ordená los países por el largo del nombre, de menor a mayor, con sorted y una lambda.", start: 'paises = ["Argentina", "Perú", "Chile", "Uruguay"]\n', expect: "['Perú', 'Chile', 'Uruguay', 'Argentina']", test: "'lambda' in _src", hint: "sorted(paises, key=lambda p: len(p))", sol: 'paises = ["Argentina", "Perú", "Chile", "Uruguay"]\nprint(sorted(paises, key=lambda p: len(p)))' }
+    ] }
+] },
+{ day: 14, title: "Funciones de orden superior", lessons: [
+  { id: "d14l1", title: "map, filter y reduce",
+    intro: [
+      "Una función puede recibir otra función como dato. Python trae tres muy usadas:",
+      { code: "numeros = [1, 2, 3, 4]\nlist(map(lambda x: x * 10, numeros))      # [10, 20, 30, 40]: transforma cada uno\nlist(filter(lambda x: x > 2, numeros))    # [3, 4]: deja los que dan True\n\nfrom functools import reduce\nreduce(lambda a, b: a + b, numeros)       # 10: combina todo en un valor" },
+      "`map` y `filter` devuelven un objeto especial. Para verlo como lista se envuelve en `list()`."
+    ],
+    ex: [
+      { t: "out", code: 'def aplicar(f, x):\n    return f(x)\nprint(aplicar(len, "hola"))', opts: ["4", "hola", "len"], why: "aplicar recibe la función len y la usa con el texto." },
+      { t: "out", code: "print(list(map(lambda x: x + 1, [1, 2, 3])))", opts: ["[2, 3, 4]", "[1, 2, 3]", "[3]"] },
+      { t: "out", code: 'print(list(map(str.upper, ["a", "b"])))', opts: ["['A', 'B']", "['a', 'b']", "AB"] },
+      { t: "out", code: "print(list(filter(lambda n: n > 2, [1, 2, 3, 4])))", opts: ["[3, 4]", "[1, 2]", "[False, False, True, True]"] },
+      { t: "out", code: "from functools import reduce\nprint(reduce(lambda a, b: a * b, [1, 2, 3, 4]))", opts: ["24", "10", "[1, 2, 6, 24]"], why: "1 × 2 × 3 × 4 = 24." },
+      { t: "mc", q: "¿Qué hace filter?", opts: ["Deja los elementos para los que la función da True", "Transforma cada elemento", "Suma todo"] },
+      { t: "code", q: "Con map, convertí la lista de números en una lista de textos y mostrala.", start: "numeros = [1, 2, 3]\n", expect: "['1', '2', '3']", test: "'map' in _src", hint: "list(map(str, numeros))", sol: "numeros = [1, 2, 3]\nprint(list(map(str, numeros)))" },
+      { t: "code", q: "Con filter, quedate solo con los países que contienen 'land'.", start: "paises = ['Estonia', 'Finland', 'Sweden', 'Denmark', 'Norway', 'Iceland']\n", expect: "['Finland', 'Iceland']", test: "'filter' in _src", hint: "list(filter(lambda p: 'land' in p, paises))", sol: "paises = ['Estonia', 'Finland', 'Sweden', 'Denmark', 'Norway', 'Iceland']\nprint(list(filter(lambda p: 'land' in p, paises)))" },
+      { t: "code", q: "Con reduce, sumá todos los números y mostrá el total.", start: "from functools import reduce\nnumeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n", expect: "55", test: "'reduce(' in _src", hint: "reduce(lambda a, b: a + b, numeros)", sol: "from functools import reduce\nnumeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nprint(reduce(lambda a, b: a + b, numeros))" }
+    ] },
+  { id: "d14l2", title: "Closures y decoradores",
+    intro: [
+      "Una función también puede devolver otra función. La de adentro recuerda los valores de la de afuera: eso es un closure.",
+      { code: "def multiplicador(n):\n    def mult(x):\n        return x * n\n    return mult\n\npor3 = multiplicador(3)\nprint(por3(5))  # 15" },
+      "Un decorador envuelve una función para agregarle algo, y se aplica con `@` arriba del def.",
+      { code: 'def gritar(f):\n    def envoltura():\n        return f().upper()\n    return envoltura\n\n@gritar\ndef saludo():\n    return "hola"\n\nprint(saludo())  # HOLA' }
+    ],
+    ex: [
+      { t: "out", code: "def mult(n):\n    def f(x):\n        return x * n\n    return f\npor3 = mult(3)\nprint(por3(5))", opts: ["15", "8", "3"] },
+      { t: "out", code: "def suma(a):\n    def f(b):\n        return a + b\n    return f\nprint(suma(10)(5))", opts: ["15", "105", "Error"] },
+      { t: "out", code: 'def gritar(f):\n    def envoltura():\n        return f().upper()\n    return envoltura\n@gritar\ndef saludo():\n    return "hola"\nprint(saludo())', opts: ["HOLA", "hola", "Error"] },
+      { t: "out", code: 'def doble(f):\n    def g():\n        f()\n        f()\n    return g\n@doble\ndef hola():\n    print("hola")\nhola()', opts: ["hola\nhola", "hola", "No muestra nada"] },
+      { t: "mc", q: "¿Qué hace un decorador?", opts: ["Envuelve una función para agregarle algo", "Borra una función", "Convierte una función en lista"] },
+      { t: "code", q: "Escribí sumador(n) que devuelva una función que le sume n a lo que reciba. Creá mas10 = sumador(10) y mostrá mas10(5).", start: "", test: "sumador(2)(3) == 5 and _out.strip() == '15'", hint: "Adentro de sumador definí otra función y devolvela con return.", sol: "def sumador(n):\n    def sumar(x):\n        return x + n\n    return sumar\n\nmas10 = sumador(10)\nprint(mas10(5))" },
+      { t: "code", q: "Escribí un decorador separar que muestre ---- antes y después de llamar a la función. Aplicalo a una función que muestre Hola y llamala.", start: "", expect: "----\nHola\n----", test: "'@' in _src", hint: 'def separar(f):\n    def envoltura():\n        print("----")\n        ...', sol: 'def separar(f):\n    def envoltura():\n        print("----")\n        f()\n        print("----")\n    return envoltura\n\n@separar\ndef hola():\n    print("Hola")\n\nhola()' }
+    ] }
+] },
+{ day: 15, title: "Tipos de errores", lessons: [
+  { id: "d15l1", title: "Leer errores",
+    intro: [
+      "Cuando algo falla, Python muestra el nombre del error y un mensaje. El nombre ya te dice qué buscar:",
+      { code: 'print("hola"          # SyntaxError: está mal escrito\nprint(edad)           # NameError: ese nombre no existe\n[1, 2][5]             # IndexError: no hay esa posición\n{"a": 1}["b"]         # KeyError: no hay esa clave\n"edad: " + 30         # TypeError: tipos que no van juntos\nint("diez")           # ValueError: valor con formato inválido\n10 / 0                # ZeroDivisionError: división por cero\n"hola".upcase()       # AttributeError: ese método no existe\nimport mat            # ModuleNotFoundError: no existe el módulo\nfrom math import raiz # ImportError: el módulo no tiene eso' }
+    ],
+    ex: [
+      { t: "out", label: "¿Qué error da?", q: "¿Qué error da?", code: "print(edad)", opts: ["NameError", "SyntaxError", "ValueError"], err: "NameError" },
+      { t: "out", label: "¿Qué error da?", q: "¿Qué error da?", code: "n = [1, 2, 3]\nprint(n[3])", opts: ["IndexError", "KeyError", "ValueError"], err: "IndexError", why: "Los índices de esa lista van del 0 al 2." },
+      { t: "out", label: "¿Qué error da?", q: "¿Qué error da?", code: 'p = {"a": 1}\nprint(p["b"])', opts: ["KeyError", "IndexError", "NameError"], err: "KeyError" },
+      { t: "out", label: "¿Qué error da?", q: "¿Qué error da?", code: "print(10 / 0)", opts: ["ZeroDivisionError", "ValueError", "TypeError"], err: "ZeroDivisionError" },
+      { t: "out", label: "¿Qué error da?", q: "¿Qué error da?", code: 'print(int("diez"))', opts: ["ValueError", "TypeError", "NameError"], err: "ValueError" },
+      { t: "out", label: "¿Qué error da?", q: "¿Qué error da?", code: 'print("edad: " + 30)', opts: ["TypeError", "ValueError", "SyntaxError"], err: "TypeError" },
+      { t: "out", label: "¿Qué error da?", q: "¿Qué error da?", code: 'print("hola".upcase())', opts: ["AttributeError", "NameError", "TypeError"], err: "AttributeError", why: "El método se llama upper()." },
+      { t: "out", label: "¿Qué error da?", q: "¿Qué error da?", code: "import mat", opts: ["ModuleNotFoundError", "ImportError", "NameError"], err: "ModuleNotFoundError" },
+      { t: "out", label: "¿Qué error da?", q: "¿Qué error da?", code: "from math import raiz", opts: ["ImportError", "ModuleNotFoundError", "NameError"], err: "ImportError", why: "El módulo math existe, pero no tiene nada llamado raiz." },
+      { t: "out", label: "¿Qué error da?", q: "¿Qué error da?", code: 'print("hola"', opts: ["SyntaxError", "NameError", "IndentationError"], err: "SyntaxError" }
+    ] },
+  { id: "d15l2", title: "Arreglar errores",
+    intro: [
+      "Para arreglar un error: leé el nombre, mirá la línea que indica y buscá la causa típica de ese error. Cada ejercicio de esta lección empieza con código roto: ejecutalo, leé el error y corregilo.",
+      { code: 'nombre = "Ana"\nprint(Nombre)   # NameError: es nombre, con minúscula' }
+    ],
+    ex: [
+      { t: "code", q: "Este código da NameError. Arreglalo para que muestre Hola, Ana.", start: 'nombre = "Ana"\nprint(f"Hola, {Nombre}")\n', expect: "Hola, Ana", hint: "Python distingue mayúsculas: Nombre y nombre son distintos.", sol: 'nombre = "Ana"\nprint(f"Hola, {nombre}")' },
+      { t: "code", q: "Este código da SyntaxError. Arreglalo.", start: 'if 5 > 3\n    print("cinco es mayor")\n', expect: "cinco es mayor", hint: "A la línea del if le falta algo al final.", sol: 'if 5 > 3:\n    print("cinco es mayor")' },
+      { t: "code", q: "Este código da TypeError. Arreglalo para que muestre Tengo 30 años.", start: 'edad = 30\nprint("Tengo " + edad + " años")\n', expect: "Tengo 30 años", hint: "Convertí edad a texto con str(), o usá un f-string.", sol: 'edad = 30\nprint("Tengo " + str(edad) + " años")' },
+      { t: "code", q: "Este código da IndexError. Mostrá el último elemento sin cambiar la lista.", start: 'frutas = ["banana", "mango", "uva"]\nprint(frutas[3])\n', expect: "uva", test: "frutas == ['banana', 'mango', 'uva']", hint: "El último es frutas[-1] (o frutas[2]).", sol: 'frutas = ["banana", "mango", "uva"]\nprint(frutas[-1])' },
+      { t: "code", q: "promedio da ZeroDivisionError con una lista vacía. Hacé que devuelva 0 en ese caso.", start: "def promedio(nums):\n    return sum(nums) / len(nums)\n\nprint(promedio([]))\n", test: "promedio([]) == 0 and promedio([2, 4]) == 3", hint: "Antes de dividir: if len(nums) == 0: return 0", sol: "def promedio(nums):\n    if len(nums) == 0:\n        return 0\n    return sum(nums) / len(nums)\n\nprint(promedio([]))" },
+      { t: "code", q: "Este código da KeyError. Usá get() para mostrar sin dato cuando falta la ciudad.", start: 'p = {"nombre": "Ana"}\nprint(p["ciudad"])\n', expect: "sin dato", test: "'get' in _src", hint: 'p.get("ciudad", "sin dato")', sol: 'p = {"nombre": "Ana"}\nprint(p.get("ciudad", "sin dato"))' }
+    ] }
 ] }
 ];
 
 const UPCOMING = [
-  [11, "Funciones"], [12, "Módulos"], [13, "Listas por comprensión"], [14, "Funciones de orden superior"],
-  [15, "Tipos de errores"], [16, "Fechas y horas"], [17, "Manejo de excepciones"], [18, "Expresiones regulares"],
+  [16, "Fechas y horas"], [17, "Manejo de excepciones"], [18, "Expresiones regulares"],
   [19, "Archivos"], [20, "Paquetes con pip"], [21, "Clases y objetos"], [22, "Web scraping"],
   [23, "Entornos virtuales"], [24, "Estadística"], [25, "Pandas"], [26, "Python para la web"],
   [27, "Python con MongoDB"], [28, "APIs"], [29, "Crear una API"], [30, "Cierre"]
@@ -875,7 +1063,17 @@ const CHEAT = {
   d9l3: [["if adentro de if", "La indentación dice a qué if pertenece cada else", "if a > 0:\n    if a % 2 == 0:\n        ..."]],
   d10l1: [["while cond:", "Repite mientras la condición sea verdadera", "while n < 5:\n    n += 1"], ["break", "Corta el bucle", "if n == 3:\n    break"], ["continue", "Pasa a la vuelta siguiente", "if n == 2:\n    continue"]],
   d10l2: [["for x in algo:", "Recorre cada elemento", "for letra in \"hola\":\n    print(letra)"], ["range(fin)  range(ini, fin, paso)", "Genera números (sin incluir fin)", "range(0, 10, 2)  # 0 2 4 6 8"], ["for k, v in d.items():", "Recorre un diccionario", "for clave, valor in p.items():"]],
-  d10l3: [["total += x", "Acumulador: suma en cada vuelta", "total = 0\nfor n in nums:\n    total += n"], ["for ... else:", "El else corre si no hubo break", "for n in nums:\n    ...\nelse:\n    print(\"sin break\")"], ["pass", "No hace nada; deja un bloque vacío", "for i in range(3):\n    pass"]]
+  d10l3: [["total += x", "Acumulador: suma en cada vuelta", "total = 0\nfor n in nums:\n    total += n"], ["for ... else:", "El else corre si no hubo break", "for n in nums:\n    ...\nelse:\n    print(\"sin break\")"], ["pass", "No hace nada; deja un bloque vacío", "for i in range(3):\n    pass"]],
+  d11l1: [["def nombre(params):", "Define una función", "def doble(n):\n    return n * 2"], ["return valor", "Devuelve un resultado y termina la función (sin return devuelve None)", "return a + b"]],
+  d11l2: [["def f(x=valor):", "Parámetro con valor por defecto", 'def saludar(nombre="amigo"):'], ["f(b=2, a=1)", "Argumentos por nombre, en cualquier orden", "resta(b=2, a=10)"], ["def f(*args):", "Recibe cualquier cantidad de argumentos (llegan como tupla)", "def total(*nums):\n    return sum(nums)"]],
+  d12l1: [["import modulo", "Trae un módulo; se usa modulo.cosa", "import math\nmath.sqrt(16)  # 4.0"], ["from modulo import a, b", "Trae solo algunas cosas", "from math import pi"], ["import ... as otro", "Le pone otro nombre", "from math import sqrt as raiz"], ["math.floor  math.ceil  math.pi", "Redondear para abajo, para arriba, y el número pi", "math.ceil(3.2)  # 4"]],
+  d12l2: [["random.randint(a, b)", "Entero al azar entre a y b, incluidos", "random.randint(1, 6)"], ["random.choice(lista)", "Un elemento al azar", 'random.choice(["a", "b"])'], ["statistics.mean / median / mode", "Promedio, el del medio y el más repetido", "statistics.mean([2, 4, 6])  # 4"], ["string.ascii_letters  string.digits", "Todas las letras y todos los dígitos", "string.digits  # 0123456789"]],
+  d13l1: [["[expr for x in lista]", "Arma una lista transformando cada elemento", "[x * 2 for x in range(3)]  # [0, 2, 4]"], ["[x for x in lista if cond]", "Con filtro", "[x for x in nums if x > 0]"]],
+  d13l2: [["lambda x: expr", "Función corta de una línea", "doble = lambda x: x * 2"], ["sorted(lista, key=f)", "Ordena según lo que devuelve f", "sorted(nombres, key=lambda n: len(n))"]],
+  d14l1: [["map(f, lista)", "Aplica f a cada elemento (envolver en list())", "list(map(str, [1, 2]))  # ['1', '2']"], ["filter(f, lista)", "Deja los elementos donde f da True", "list(filter(lambda x: x > 2, nums))"], ["reduce(f, lista)", "Combina todo en un valor (from functools import reduce)", "reduce(lambda a, b: a + b, nums)"]],
+  d14l2: [["closure", "Función que devuelve otra función que recuerda valores", "def mult(n):\n    def f(x):\n        return x * n\n    return f"], ["@decorador", "Envuelve una función para agregarle algo", "@gritar\ndef saludo():\n    ..."]],
+  d15l1: [["NameError  SyntaxError", "Nombre inexistente / código mal escrito", "print(edad)"], ["IndexError  KeyError", "Posición o clave que no existe", "lista[9]  dic[\"x\"]"], ["TypeError  ValueError", "Tipos que no van juntos / valor con formato inválido", 'int("diez")'], ["ZeroDivisionError  AttributeError", "División por cero / método que no existe", '"hola".upcase()'], ["ModuleNotFoundError  ImportError", "El módulo no existe / no tiene eso", "from math import raiz"]],
+  d15l2: [["Arreglar un error", "Leé el nombre del error, mirá la línea que marca y buscá la causa típica", "# NameError: ¿mayúsculas? ¿comillas?"]]
 };
 
 </script>
@@ -1054,6 +1252,10 @@ function loadPython() {
     s.src = BRYTHON_URL; s.async = true;
     s.onerror = () => reject(new Error("load"));
     s.onload = () => {
+      const std = document.createElement("script");
+      std.src = "brython_stdlib.js"; std.async = true;
+      std.onerror = () => reject(new Error("load"));
+      std.onload = () => {
       try {
         const py = document.createElement("script");
         py.type = "text/python"; py.id = "pyrunner"; py.textContent = RUNNER;
@@ -1062,6 +1264,8 @@ function loadPython() {
       } catch (e) { reject(e); return; }
       const t0 = Date.now();
       (function wait() { if (window.pyRun) resolve(); else if (Date.now() - t0 > 12000) reject(new Error("timeout")); else setTimeout(wait, 40); })();
+      };
+      document.head.appendChild(std);
     };
     document.head.appendChild(s);
   });
@@ -1096,7 +1300,11 @@ const ERR_TIPS = {
   ValueError: "El valor no tiene el formato esperado, por ejemplo int(\"hola\").",
   IndexError: "Pediste un índice que no existe. Recordá que se cuenta desde 0.",
   ZeroDivisionError: "No se puede dividir por cero.",
-  AttributeError: "Ese método no existe para este tipo de dato. Revisá cómo está escrito."
+  AttributeError: "Ese método no existe para este tipo de dato. Revisá cómo está escrito.",
+  KeyError: "Esa clave no está en el diccionario. Revisá cómo está escrita o usá get().",
+  ModuleNotFoundError: "Ese módulo no existe. Revisá el nombre (por ejemplo math, random, statistics).",
+  ImportError: "El módulo existe, pero no tiene eso que querés importar. Revisá el nombre.",
+  RuntimeError: "El programa se cortó mientras corría."
 };
 function normOut(s) { return s.replace(/\r/g, "").split("\n").map(l => l.replace(/\s+$/, "")).join("\n").trim(); }
 
@@ -1151,7 +1359,7 @@ function renderHome() {
     });
     html += "</div></section>";
   });
-  html += `<section class="soon"><h2>Próximamente: días 11 a 30</h2>
+  html += `<section class="soon"><h2>Próximamente: días 16 a 30</h2>
     <p>Se agregan por tandas. Los días 20, 23, 26, 27 y 29 llevan teoría y desafíos para hacer en la computadora.</p>
     <ol>${UPCOMING.map(([n, t]) => `<li><b>${n}</b><span>${esc(t)}</span></li>`).join("")}</ol></section>`;
   html += `<section class="soon"><h2>Después del día 30</h2><ol>${BEYOND.map((t, i) => `<li><b>+${i + 1}</b><span>${esc(t)}</span></li>`).join("")}</ol></section>`;
@@ -1279,8 +1487,8 @@ const KIND = { mc: "Elegí la respuesta", out: "¿Qué muestra este código?", f
 function renderExercise() {
   const item = lesson.queue[0], e = item.ex;
   lesson.answer = null; item.attempts = item.attempts || 0;
-  let body = `<div class="kind ${item.redo ? "redo" : ""}">${item.redo ? "Otra vez" : KIND[e.t]}</div>`;
-  if (e.t === "out") body += `<div class="q">¿Qué muestra?</div><pre class="code">${hl(e.code)}</pre>`;
+  let body = `<div class="kind ${item.redo ? "redo" : ""}">${item.redo ? "Otra vez" : (e.label || KIND[e.t])}</div>`;
+  if (e.t === "out") body += `<div class="q">${e.q ? inline(e.q) : "¿Qué muestra?"}</div><pre class="code">${hl(e.code)}</pre>`;
   else body += `<div class="q">${inline(e.q)}</div>`;
   if (e.t === "mc" || e.t === "out") {
     item.order = item.order || shuffle(e.opts.map((_, i) => i));
@@ -1524,7 +1732,7 @@ document.addEventListener("keydown", ev => {
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && !lesson && remote.ref) remote.ref.get().then(s => { if (s.exists && adopt(s.data())) renderHome(); }).catch(() => {}); });
 
 // ---------- Actualización ----------
-const APP_BUILD = "2026-11-07T00:08";
+const APP_BUILD = "2026-11-07T19:57";
 const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 function buildLabel(b) {
   const m = String(b).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
