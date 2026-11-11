@@ -191,6 +191,16 @@ main.home { padding-block: 18px 48px; display: flex; flex-direction: column; gap
 .gh-status { font-weight: 700; color: var(--ink) !important; }
 .gh-status.ok { color: var(--ok) !important; } .gh-status.bad { color: var(--bad) !important; }
 #ghSec p, #pcSec p { margin: 0; color: var(--muted); font-size: 15px; }
+.try { display: flex; flex-direction: column; gap: 0; border-radius: 14px; overflow: hidden; background: var(--code-bg); }
+.try pre.code { border-radius: 0; }
+.try-ed { display: block; width: 100%; border: 0; outline: none; resize: none; background: var(--code-bg); color: var(--code-ink); font-family: var(--f-code); font-size: 16px; line-height: 1.55; padding: 14px 16px; white-space: pre; overflow-x: auto; tab-size: 4; font-variant-ligatures: none; caret-color: var(--code-str); }
+.try-bar { display: flex; gap: 6px; padding: 8px; border-top: 1px solid rgba(255,255,255,.08); flex-wrap: wrap; }
+.try-bar button { display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 8px; background: rgba(255,255,255,.12); color: var(--code-ink); font-weight: 700; font-size: 14px; padding: 6px 12px; min-height: 36px; }
+.try-bar button svg { width: 14px; height: 14px; }
+.try-run { background: var(--ok) !important; color: #fff !important; }
+.try-out { margin: 0; background: var(--surface); color: var(--ink); border-top: 2px solid var(--line); padding: 10px 14px; font-family: var(--f-code); font-size: 15px; white-space: pre-wrap; word-break: break-word; font-variant-ligatures: none; }
+.try-out .err { color: var(--bad); } .try-out .muted { color: var(--muted); }
+.try-hint { font-size: 14px; color: var(--muted); background: var(--blue-soft); border-radius: 10px; padding: 8px 12px; }
 .sync { text-align: center; color: var(--muted); font-size: 13px; }
 .sync .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--lock-ink); margin-right: 6px; vertical-align: middle; }
 .sync.on .dot { background: var(--ok); }
@@ -728,6 +738,10 @@ const COURSE = [
       "h": "Reglas para los nombres"
      },
      "Pueden tener letras, números y guion bajo. No pueden empezar con un número ni tener espacios o guiones. Python distingue mayúsculas: `edad` y `Edad` son dos variables distintas. Por costumbre se escriben en minúscula y con guion bajo entre palabras: `precio_final`.",
+     "Si usás un nombre que nunca creaste, o lo escribís con otra mayúscula, Python da NameError: no sabe a qué te referís. Ejecutá este ejemplo:",
+     {
+      "code": "Edad = 30\nprint(edad)   # NameError: edad (con minúscula) no existe"
+     },
      {
       "tip": "Usá nombres que digan qué guardan. precio_con_iva se entiende solo. x no dice nada."
      },
@@ -2288,6 +2302,10 @@ const COURSE = [
      {
       "code": "n = [10, 20, 30]\nn[0] = 99\nprint(n)          # [99, 20, 30]\nprint(30 in n)    # True"
      },
+     "Con un texto, lo mismo da TypeError, porque los textos no se pueden modificar:",
+     {
+      "code": "t = \"hola\"\nt[0] = \"H\"   # TypeError"
+     },
      {
       "tip": "Esto se llama ser mutable. Las listas son mutables; los textos y las tuplas, no."
      },
@@ -2469,7 +2487,7 @@ const COURSE = [
     "title": "Ordenar, contar y unir",
     "intro": [
      {
-      "code": "n = [3, 1, 2, 1]\nprint(n.count(1))     # 2: cuántas veces aparece\nprint(n.index(2))     # 2: en qué posición está\nn.sort()              # ordena la lista original\nprint(n)              # [1, 1, 2, 3]\nn.sort(reverse=True)  # de mayor a menor\nprint(sorted([3, 1, 2]))  # [1, 2, 3]: devuelve una lista nueva"
+      "code": "n = [3, 1, 2, 1]\nprint(n.count(1))     # 2: cuántas veces aparece\nprint(n.index(2))     # 2: en qué posición está\nn.reverse()           # da vuelta el orden actual, sin ordenar\nprint(n)              # [1, 2, 1, 3]\nn.sort()              # ordena la lista original\nprint(n)              # [1, 1, 2, 3]\nn.sort(reverse=True)  # de mayor a menor\nprint(sorted([3, 1, 2]))  # [1, 2, 3]: devuelve una lista nueva"
      },
      "La diferencia importante: `sort()` ordena la lista misma y no devuelve nada. `sorted()` deja la original como estaba y te da una copia ordenada.",
      {
@@ -2813,7 +2831,10 @@ const COURSE = [
      {
       "code": "frutas = {\"banana\", \"mango\"}\nfrutas.add(\"uva\")\nfrutas.add(\"uva\")          # no se duplica\nprint(len(frutas))         # 3\nprint(\"mango\" in frutas)   # True\nprint(set([1, 1, 2, 2]))   # {1, 2}"
      },
-     "Como no tienen orden, no tienen índices: `frutas[0]` da error.",
+     "Como no tienen orden, no tienen índices: `frutas[0]` da TypeError.",
+     {
+      "code": "s = {1, 2, 3}\nprint(s[0])   # TypeError"
+     },
      {
       "code": "s = {1, 2, 3}\ns.remove(3)    # saca el 3 (error si no está)\ns.discard(9)   # saca el 9 si está, y si no, no hace nada\nvacio = set()  # {} solo sería un diccionario vacío"
      },
@@ -3970,6 +3991,10 @@ const COURSE = [
      {
       "code": "def saludar(nombre=\"amigo\"):\n    print(f\"Hola, {nombre}\")\n\nsaludar()         # Hola, amigo\nsaludar(\"Ana\")    # Hola, Ana"
      },
+     "Si un parámetro no tiene valor por defecto, es obligatorio. Llamar a la función sin ese dato da TypeError:",
+     {
+      "code": "def sumar(a, b):\n    return a + b\n\nprint(sumar(1))   # TypeError: falta b"
+     },
      {
       "h": "Argumentos por nombre"
      },
@@ -4162,11 +4187,15 @@ const COURSE = [
     "intro": [
      "Un módulo es un archivo de Python con funciones listas para usar. Python trae cientos (a eso se le llama la biblioteca estándar) y hay miles más hechos por otras personas. Para usar un módulo, lo importás.",
      {
-      "code": "import math\nprint(math.sqrt(16))   # 4.0: raíz cuadrada\nprint(math.pi)         # 3.141592653589793\nprint(math.ceil(3.2))  # 4: redondea para arriba"
+      "code": "import math\nprint(math.sqrt(16))   # 4.0: raíz cuadrada\nprint(math.pi)         # 3.141592653589793\nprint(math.floor(3.7)) # 3: redondea para abajo\nprint(math.ceil(3.2))  # 4: redondea para arriba"
      },
      "Con `import math`, cada cosa del módulo se usa con el prefijo `math.`. Si solo necesitás algunas, las traés directo y te ahorrás el prefijo:",
      {
       "code": "from math import sqrt, pi\nprint(sqrt(9))   # 3.0\nfrom math import sqrt as raiz   # con otro nombre\nprint(raiz(25))  # 5.0"
+     },
+     "Si importaste con `import math` y escribís `sqrt` sin el prefijo, Python da NameError:",
+     {
+      "code": "import math\nprint(sqrt(4))   # NameError: hay que escribir math.sqrt"
      },
      {
       "h": "Tus propios módulos"
@@ -5607,15 +5636,18 @@ function renderLesson() {
 }
 function renderIntro() {
   const l = lesson.l;
-  const blocks = renderBlocks(l.intro);
+  const blocks = '<p class="try-hint">Tocá Ejecutar en cada ejemplo para ver qué muestra. Con Cambiar y probar lo modificás y lo volvés a ejecutar, las veces que quieras.</p>' + renderBlocks(l.intro, true);
   app.innerHTML = lessonShell(`<div class="kind">Día ${l.day} · ${lesson.kind === "day" ? "Repaso" : "Explicación"}</div><h1 class="q">${esc(l.title)}</h1><div class="theory prose">${blocks}</div>`,
     `<button class="btn wide" id="go">Practicar</button>`);
   $("#quit").onclick = quitLesson;
+  wireTry(app); loadPython().catch(() => {});
   $("#go").onclick = () => { lesson.stage = "ex"; renderLesson(); };
 }
 
-function renderBlocks(blocks) {
+function renderBlocks(blocks, runnable) {
   return (blocks || []).map(b => {
+    if (b && b.code && runnable && !b.norun) return `<div class="try"><pre class="code">${hl(b.code)}</pre><textarea class="try-ed" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" hidden aria-label="Editar ejemplo">${esc(b.code)}</textarea>
+      <div class="try-bar"><button class="try-run" type="button">${I.play}Ejecutar</button><button class="try-edit" type="button">Cambiar y probar</button></div><pre class="try-out" hidden></pre></div>`;
     if (typeof b === "string") return `<p>${inline(b)}</p>`;
     if (b.h) return `<h3 class="th">${esc(b.h)}</h3>`;
     if (b.code) return `<pre class="code">${hl(b.code)}</pre>`;
@@ -5624,14 +5656,40 @@ function renderBlocks(blocks) {
     return "";
   }).join("");
 }
+// Ejemplos de las explicaciones: se pueden ejecutar y modificar antes de los ejercicios.
+function wireTry(root) {
+  root.querySelectorAll(".try").forEach(box => {
+    const pre = box.querySelector("pre.code"), ta = box.querySelector(".try-ed"), out = box.querySelector(".try-out"), editBtn = box.querySelector(".try-edit");
+    const fit = () => { ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 4) + "px"; };
+    editBtn.onclick = () => {
+      if (ta.hidden) { ta.hidden = false; pre.hidden = true; fit(); ta.focus(); editBtn.textContent = "Volver al original"; }
+      else { ta.value = ta.defaultValue; ta.hidden = true; pre.hidden = false; out.hidden = true; editBtn.textContent = "Cambiar y probar"; }
+    };
+    ta.addEventListener("input", fit);
+    ta.addEventListener("keydown", ev => { if (ev.key === "Tab") { ev.preventDefault(); ta.setRangeText("    ", ta.selectionStart, ta.selectionEnd, "end"); } });
+    box.querySelector(".try-run").onclick = async () => {
+      out.hidden = false; out.className = "try-out"; out.textContent = window.pyRun ? "Ejecutando…" : "Cargando Python…";
+      try {
+        const r = await runPython(cleanSrc(ta.value), "", []);
+        let txt = r.out.replace(/\n$/, "");
+        if (r.err) {
+          let msg = r.err;
+          if (msg.includes("LIMITE_BUCLE")) msg = "El bucle dio más de 100.000 vueltas y lo corté.";
+          out.innerHTML = (txt ? esc(txt) + "\n" : "") + '<span class="err">' + esc(msg) + "</span>";
+        } else out.innerHTML = txt ? esc(txt) : '<span class="muted">(no muestra nada: este ejemplo no tiene print)</span>';
+      } catch (e) { out.innerHTML = '<span class="err">No se pudo cargar Python. Revisá la conexión.</span>'; }
+    };
+  });
+}
 function lessonOf(exId) { return LESSONS.find(l => l.id === String(exId).replace(/-\d+$/, "")); }
 function openTheory(exId) {
   closeTheory();
   const l = lessonOf(exId); if (!l) return;
   const panel = el(`<div class="cheat theory-panel" id="theory" role="dialog" aria-label="Explicación">
     <div class="cheat-head"><div><h2>${esc(l.title)}</h2><p>Día ${l.day} · Explicación</p></div><button class="icon-btn" id="theoryClose" aria-label="Cerrar">${I.close}</button></div>
-    <div class="cheat-list prose theory">${renderBlocks(l.intro)}</div></div>`);
+    <div class="cheat-list prose theory">${renderBlocks(l.intro, true)}</div></div>`);
   document.body.appendChild(panel);
+  wireTry(panel);
   $("#theoryClose").onclick = closeTheory;
 }
 function closeTheory() { const p = $("#theory"); if (p) p.remove(); }
@@ -6004,7 +6062,7 @@ function renderGh() {
 window.addEventListener("online", () => scheduleSync());
 
 // ---------- Actualización ----------
-const APP_BUILD = "2026-11-11T19:13";
+const APP_BUILD = "2026-11-11T19:25";
 const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 function buildLabel(b) {
   const m = String(b).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
