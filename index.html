@@ -201,6 +201,12 @@ main.home { padding-block: 18px 48px; display: flex; flex-direction: column; gap
 .try-out { margin: 0; background: var(--surface); color: var(--ink); border-top: 2px solid var(--line); padding: 10px 14px; font-family: var(--f-code); font-size: 15px; white-space: pre-wrap; word-break: break-word; font-variant-ligatures: none; }
 .try-out .err { color: var(--bad); } .try-out .muted { color: var(--muted); }
 .try-hint { font-size: 14px; color: var(--muted); background: var(--blue-soft); border-radius: 10px; padding: 8px 12px; }
+.sandbox { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; background: var(--code-bg); border: 2px solid var(--line); margin-top: 6px; }
+.sb-head { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px 4px; color: var(--code-ink); }
+.sb-head b { font-family: var(--f-display); font-weight: 600; font-size: 16px; }
+.sb-head span { font-size: 13px; color: var(--code-com); }
+.sandbox .try-ed { min-height: 96px; }
+.sandbox .try-ed::placeholder { color: var(--code-com); }
 .sync { text-align: center; color: var(--muted); font-size: 13px; }
 .sync .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--lock-ink); margin-right: 6px; vertical-align: middle; }
 .sync.on .dot { background: var(--ok); }
@@ -5581,7 +5587,7 @@ function startLesson(id) {
   const l = LESSONS.find(x => x.id === id);
   if (heartsNow() <= 0) { renderNoHearts(); return; }
   lesson = { kind: "lesson", l, review: false, queue: l.ex.map((e, i) => ({ ex: e, id: l.id + "-" + i, redo: false })), total: l.ex.length, correct: 0, missed: new Set(), stage: "intro", answer: null };
-  if (needsPython(lesson.queue)) loadPython().catch(() => {});
+  loadPython().catch(() => {});
   renderLesson();
 }
 function startDayReview(day) {
@@ -5656,6 +5662,53 @@ function renderBlocks(blocks, runnable) {
     return "";
   }).join("");
 }
+// Probador: un editor chico debajo de las preguntas para probar código antes de responder.
+const SB_KEYS = ["(", ")", '"', ":", "=", "[", "]", ",", ".", "_", "+", "#", "{", "}", "'", "*", "-", "/", "<", ">", "⇥"];
+function sandboxHtml() {
+  return `<section class="sandbox" aria-label="Probador">
+    <div class="sb-head"><b>Probador</b><span>Escribí código y ejecutalo para ver qué sale antes de responder.</span></div>
+    <textarea id="sb" class="try-ed" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="print(...)" aria-label="Código para probar">${esc((lesson && lesson.sandbox) || "")}</textarea>
+    <div class="keys" id="sbKeys">${SB_KEYS.map(k => `<button type="button" data-k="${esc(k)}" aria-label="Insertar ${k === "⇥" ? "4 espacios" : esc(k)}">${esc(k)}</button>`).join("")}</div>
+    <div class="try-bar"><button class="try-run" id="sbRun" type="button">${I.play}Ejecutar</button><button id="sbClear" type="button">Borrar</button></div>
+    <pre class="try-out" id="sbOut" hidden></pre></section>`;
+}
+function wireSandbox() {
+  const ta = $("#sb"), out = $("#sbOut");
+  const fit = () => { ta.style.height = "auto"; ta.style.height = Math.max(96, ta.scrollHeight + 4) + "px"; };
+  const keep = () => { if (lesson) lesson.sandbox = ta.value; fit(); };
+  fit();
+  const insert = (txt) => { ta.setRangeText(txt, ta.selectionStart, ta.selectionEnd, "end"); ta.focus(); keep(); };
+  ta.addEventListener("input", keep);
+  ta.addEventListener("keydown", ev => {
+    if (ev.key === "Tab") { ev.preventDefault(); insert("    "); }
+    else if (ev.key === "Enter" && (ev.metaKey || ev.ctrlKey)) { ev.preventDefault(); $("#sbRun").click(); }
+    else if (ev.key === "Enter") {
+      const line = ta.value.slice(0, ta.selectionStart).split("\n").pop();
+      let ind = (line.match(/^ */) || [""])[0]; if (/:\s*$/.test(line)) ind += "    ";
+      if (ind) { ev.preventDefault(); insert("\n" + ind); }
+    }
+  });
+  document.querySelectorAll("#sbKeys button").forEach(b => {
+    b.addEventListener("pointerdown", ev => ev.preventDefault());
+    b.onclick = () => insert(b.dataset.k === "⇥" ? "    " : b.dataset.k);
+  });
+  $("#sbClear").onclick = () => { ta.value = ""; keep(); out.hidden = true; ta.focus(); };
+  $("#sbRun").onclick = async () => {
+    if (!ta.value.trim()) { out.hidden = false; out.innerHTML = '<span class="muted">Escribí algo de código arriba, por ejemplo print(7 // 2).</span>'; return; }
+    out.hidden = false; out.textContent = window.pyRun ? "Ejecutando…" : "Cargando Python…";
+    try {
+      const r = await runPython(cleanSrc(ta.value), "", []);
+      const txt = r.out.replace(/\n$/, "");
+      if (r.err) {
+        let msg = r.err;
+        if (msg.includes("LIMITE_BUCLE")) msg = "El bucle dio más de 100.000 vueltas y lo corté.";
+        const tip = ERR_TIPS[msg.split(":")[0]];
+        out.innerHTML = (txt ? esc(txt) + "\n" : "") + '<span class="err">' + esc(msg) + "</span>" + (tip ? '\n<span class="muted">' + esc(tip) + "</span>" : "");
+      } else out.innerHTML = txt ? esc(txt) : '<span class="muted">(no muestra nada: para ver un resultado usá print)</span>';
+    } catch (err) { out.innerHTML = '<span class="err">No se pudo cargar Python. Revisá la conexión.</span>'; }
+  };
+}
+
 // Ejemplos de las explicaciones: se pueden ejecutar y modificar antes de los ejercicios.
 function wireTry(root) {
   root.querySelectorAll(".try").forEach(box => {
@@ -5725,7 +5778,9 @@ function renderExercise() {
       <div id="hintbox"></div>
       <div class="console" id="console"><div class="head"><span>Salida</span><span id="pystat">${window.pyRun ? "" : "Cargando Python…"}</span></div><pre id="outp"></pre></div>`;
   }
+  if (e.t !== "code") body += sandboxHtml();
   app.innerHTML = lessonShell(body, `<button class="btn wide ok" id="check" disabled>Comprobar</button>`);
+  if (e.t !== "code") wireSandbox();
   $("#quit").onclick = quitLesson;
   $("#theoryBtn").onclick = (ev) => { ev.stopPropagation(); if ($("#theory")) closeTheory(); else openTheory(item.id); };
   wireExercise(item);
@@ -6062,7 +6117,7 @@ function renderGh() {
 window.addEventListener("online", () => scheduleSync());
 
 // ---------- Actualización ----------
-const APP_BUILD = "2026-11-11T19:25";
+const APP_BUILD = "2026-11-11T20:37";
 const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 function buildLabel(b) {
   const m = String(b).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
